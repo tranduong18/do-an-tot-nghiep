@@ -2,8 +2,7 @@ package vn.jobhunter.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
@@ -38,13 +37,13 @@ public class SecurityUtil {
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
-    @Value("${hoidanit.jwt.base64-secret}")
+    @Value("${jwt.base64-secret}")
     private String jwtKey;
 
-    @Value("${hoidanit.jwt.access-token-validity-in-seconds}")
+    @Value("${jwt.access-token-validity-in-seconds}")
     private long accessTokenExpiration;
 
-    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    @Value("${jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public String createAccessToken(String email, ResLoginDTO dto) {

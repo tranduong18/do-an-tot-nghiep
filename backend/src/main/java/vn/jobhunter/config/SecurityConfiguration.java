@@ -32,7 +32,7 @@ import vn.jobhunter.util.SecurityUtil;
 @EnableMethodSecurity(securedEnabled = true)
 // cho phép phân quyền ở mức độ phương thức
 public class SecurityConfiguration {
-    @Value("${hoidanit.jwt.base64-secret}")
+    @Value("${jwt.base64-secret}")
     private String jwtKey;
 
     @Bean

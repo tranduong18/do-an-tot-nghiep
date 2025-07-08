@@ -28,7 +28,7 @@ import vn.jobhunter.util.error.StorageException;
 @RestController
 @RequestMapping("/api/v1")
 public class FileController {
-    @Value("${hoidanit.upload-file.base-uri}")
+    @Value("${upload-file.base-uri}")
     private String baseURI;
 
     private final FileService fileService;
