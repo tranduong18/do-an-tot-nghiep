@@ -11,7 +11,7 @@ import Loading from 'components/share/loading';
 import LoginPage from 'pages/auth/login';
 import RegisterPage from 'pages/auth/register';
 import LayoutAdmin from 'components/admin/layout.admin';
-import ProtectedRoute from 'components/share/protected-route.ts';
+import ProtectedRoute from 'components/share/protected-route';
 import Header from 'components/client/header.client';
 import Footer from 'components/client/footer.client';
 import HomePage from 'pages/home';

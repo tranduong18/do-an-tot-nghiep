@@ -1,74 +1,46 @@
 package vn.jobhunter.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.net.URL;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileService {
-    @Value("${upload-file.base-uri}")
-    private String baseURI;
+    private final CloudinaryService cloudinaryService;
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
 
-    public void createDirectory(String folder) throws URISyntaxException {
-        URI uri = new URI(folder);
-        Path path = Paths.get(uri);
-        File tmpDir = new File(path.toString());
-        if (!tmpDir.isDirectory()) {
-            try {
-                Files.createDirectory(tmpDir.toPath());
-                System.out.println(">>> CREATE NEW DIRECTORY SUCCESSFUL, PATH = " + tmpDir.toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println(">>> SKIP MAKING DIRECTORY, ALREADY EXISTS");
-        }
+    public FileService(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
     }
 
-    public String store(MultipartFile file, String folder) throws URISyntaxException, IOException {
-        // create unique filename
-        String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-
-        URI uri = new URI(baseURI + folder + "/" + finalName);
-        Path path = Paths.get(uri);
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-        }
-        return finalName;
+    public Map<String, Object> upload(MultipartFile file, String folder, String type) throws IOException {
+        return switch (type.toLowerCase()) {
+            case "image" -> cloudinaryService.uploadImage(file, folder);
+            case "file" -> cloudinaryService.uploadRawFile(file, folder);
+            default -> throw new IllegalArgumentException("Invalid type: only 'image' or 'file' allowed");
+        };
     }
 
-    public long getFileLength(String fileName, String folder) throws URISyntaxException {
-        URI uri = new URI(baseURI + folder + "/" + fileName);
-        Path path = Paths.get(uri);
-
-        File tmpDir = new File(path.toString());
-
-        // file không tồn tại, hoặc file là 1 director => return 0
-        if (!tmpDir.exists() || tmpDir.isDirectory()) {
-            return 0;
-        }
-        return tmpDir.length();
+    public boolean delete(String publicId, String type) throws IOException {
+        Map<String, Object> result = cloudinaryService.deleteFile(publicId, type);
+        return "ok".equals(result.get("result"));
     }
 
-    public InputStreamResource getResource(String fileName, String folder)
-            throws URISyntaxException, FileNotFoundException {
-        URI uri = new URI(baseURI + folder + "/" + fileName);
-        Path path = Paths.get(uri);
+    public byte[] downloadFile(String publicId, String resourceType) throws IOException {
+        String url = String.format("https://res.cloudinary.com/%s/%s/upload/%s",
+                cloudName, resourceType, publicId);
+        System.out.println(">>> Downloading from Cloudinary URL: " + url);
 
-        File file = new File(path.toString());
-        return new InputStreamResource(new FileInputStream(file));
+        try (InputStream in = new URL(url).openStream()) {
+            return in.readAllBytes();
+        } catch (IOException e) {
+            throw new IOException("Failed to download file from Cloudinary", e);
+        }
     }
 }

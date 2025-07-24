@@ -11,9 +11,11 @@ import resumeReducer from './slice/resumeSlide';
 import permissionReducer from './slice/permissionSlide';
 import roleReducer from './slice/roleSlide';
 import skillReducer from './slice/skillSlide';
+import dashboardReducer from './slice/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
+    dashboard: dashboardReducer,
     account: accountReducer,
     company: companyReducer,
     user: userReducer,

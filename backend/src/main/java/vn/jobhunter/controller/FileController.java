@@ -1,91 +1,108 @@
 package vn.jobhunter.controller;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import vn.jobhunter.domain.response.file.ResUploadFileDTO;
 import vn.jobhunter.service.FileService;
 import vn.jobhunter.util.annotation.ApiMessage;
 import vn.jobhunter.util.error.StorageException;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/v1")
 public class FileController {
-    @Value("${upload-file.base-uri}")
-    private String baseURI;
 
     private final FileService fileService;
+
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
     }
 
     @PostMapping("/files")
-    @ApiMessage("Upload single file")
-    public ResponseEntity<ResUploadFileDTO> upload(
-            @RequestParam(name = "file", required = false) MultipartFile file,
-            @RequestParam("folder") String folder) throws URISyntaxException, IOException, StorageException {
-        // skip validate
+    @ApiMessage("Upload file or image to Cloudinary")
+    public ResponseEntity<ResUploadFileDTO> uploadFileToCloudinary(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("folder") String folder,
+            @RequestParam("type") String type // "image" hoặc "file"
+    ) throws IOException, StorageException {
         if (file == null || file.isEmpty()) {
             throw new StorageException("File is empty. Please upload a file");
         }
-        String fileName = file.getOriginalFilename();
-        List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx");
-        boolean isValid = allowedExtensions.stream().anyMatch(item -> fileName.toLowerCase().endsWith(item));
 
-        if (!isValid) {
-            throw new StorageException("Invalid file extension, only allows " + allowedExtensions.toString());
+        String fileName = Objects.requireNonNull(file.getOriginalFilename()).toLowerCase();
+
+        List<String> allowed;
+        if ("image".equalsIgnoreCase(type)) {
+            allowed = List.of("jpg", "jpeg", "png", "gif", "webp");
+        } else if ("file".equalsIgnoreCase(type)) {
+            allowed = List.of("pdf", "doc", "docx");
+        } else {
+            throw new StorageException("Invalid type. Only 'image' or 'file' allowed.");
         }
 
-        // create a directory if not exist
-        this.fileService.createDirectory(baseURI + folder);
+        boolean isValid = allowed.stream().anyMatch(fileName::endsWith);
+        if (!isValid) {
+            throw new StorageException("Invalid file extension for type '" + type + "'");
+        }
 
-        // store file
-        String uploadFile = this.fileService.store(file, folder);
+        Map<String, Object> result = fileService.upload(file, folder, type);
+        String url = result.get("secure_url").toString();
+        Instant uploadedAt = Instant.now();
+        System.out.println(">>> Uploaded to Cloudinary, public_id = " + result.get("public_id"));
 
-        ResUploadFileDTO res = new ResUploadFileDTO(uploadFile, Instant.now());
+        return ResponseEntity.ok(new ResUploadFileDTO(url, uploadedAt));
+    }
 
-        return ResponseEntity.ok().body(res);
+    @DeleteMapping("/files")
+    @ApiMessage("Delete file on Cloudinary")
+    public ResponseEntity<?> deleteFile(
+            @RequestParam("publicId") String publicId,
+            @RequestParam("type") String type // "image" hoặc "file"
+    ) throws IOException, StorageException {
+        if (publicId == null || publicId.isEmpty()) {
+            throw new StorageException("Missing required param: publicId");
+        }
+
+        boolean deleted = fileService.delete(publicId, type.equalsIgnoreCase("file") ? "raw" : "image");
+        if (deleted) {
+            return ResponseEntity.ok(Map.of("message", "File deleted successfully"));
+        } else {
+            return ResponseEntity.status(400).body(Map.of("message", "File not found or already deleted"));
+        }
     }
 
     @GetMapping("/files")
-    @ApiMessage("Download a file")
-    public ResponseEntity<Resource> download(
-            @RequestParam(name = "fileName", required = false) String fileName,
-            @RequestParam(name = "folder", required = false) String folder)
-            throws StorageException, URISyntaxException, FileNotFoundException {
-        if (fileName == null || folder == null) {
-            throw new StorageException("Missing required params: (fileName or folder) in query params.");
+    @ApiMessage("Download file from Cloudinary (return actual file)")
+    public ResponseEntity<byte[]> downloadFileDirect(
+            @RequestParam("publicId") String publicId,
+            @RequestParam("type") String type
+    ) throws IOException, StorageException {
+        if (publicId == null || publicId.isEmpty()) {
+            throw new StorageException("Missing required param: publicId");
         }
 
-        // check file exist (and not a directory)
-        long fileLength = this.fileService.getFileLength(fileName, folder);
-        if (fileLength == 0) {
-            throw new StorageException("File with name = " + fileName + " not found");
-        }
+        String resourceType = type.equalsIgnoreCase("file") ? "raw" : "image";
 
-        // download a file
-        InputStreamResource resource = this.fileService.getResource(fileName, folder);
+        // Lấy file từ Cloudinary
+        byte[] fileBytes = fileService.downloadFile(publicId, resourceType);
 
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .contentLength(fileLength).contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        // Xác định tên file
+        String[] parts = publicId.split("/");
+        String filename = parts[parts.length - 1];
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .header("Content-Type", "application/octet-stream")
+                .body(fileBytes);
     }
 }

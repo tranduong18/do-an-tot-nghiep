@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.User;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -19,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long>,
     User findByRefreshTokenAndEmail(String token, String email);
 
     List<User> findByCompany(Company company);
+
+    long countByCreatedAtBetween(Instant createdAt, Instant createdAt2);
 }
