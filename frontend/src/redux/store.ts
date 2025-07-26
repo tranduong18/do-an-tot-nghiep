@@ -12,11 +12,13 @@ import permissionReducer from './slice/permissionSlide';
 import roleReducer from './slice/roleSlide';
 import skillReducer from './slice/skillSlide';
 import dashboardReducer from './slice/dashboardSlice';
+import userDetailReducer from './slice/userDetailSlide';
 
 export const store = configureStore({
   reducer: {
     dashboard: dashboardReducer,
     account: accountReducer,
+    userDetail: userDetailReducer,
     company: companyReducer,
     user: userReducer,
     job: jobReducer,

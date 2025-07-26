@@ -27,6 +27,8 @@ const ModalUser = (props: IProps) => {
 
     const [form] = Form.useForm();
 
+    console.log(dataInit);
+
     useEffect(() => {
         if (dataInit?.id) {
             if (dataInit.company) {
@@ -70,7 +72,8 @@ const ModalUser = (props: IProps) => {
                 company: {
                     id: company.value,
                     name: company.label
-                }
+                },
+                avatar: ""
             }
 
             const res = await callUpdateUser(user);
@@ -97,7 +100,8 @@ const ModalUser = (props: IProps) => {
                 company: {
                     id: company.value,
                     name: company.label
-                }
+                },
+                avatar: ""
             }
             const res = await callCreateUser(user);
             if (res.data) {
@@ -210,7 +214,7 @@ const ModalUser = (props: IProps) => {
                             label="Tuổi"
                             name="age"
                             rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập nhập tuổi"
+                            placeholder="Nhập tuổi"
                         />
                     </Col>
                     <Col lg={6} md={6} sm={24} xs={24}>

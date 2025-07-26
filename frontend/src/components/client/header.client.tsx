@@ -98,7 +98,13 @@ const Header = (props: any) => {
                     {!isMobile ?
                         <div style={{ display: "flex", gap: 30 }}>
                             <div className={styles['brand']} >
-                                <FaReact onClick={() => navigate('/')} title='Hỏi Dân IT' />
+                                <img
+                                    src="logo.webp"
+                                    alt="Trang chủ"
+                                    onClick={() => navigate('/')}
+                                    title="Trang chủ"
+                                    style={{ cursor: 'pointer', width: '25px', height: '25px' }}
+                                />
                             </div>
                             <div className={styles['top-menu']}>
                                 <ConfigProvider

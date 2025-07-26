@@ -11,22 +11,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.request.ReqLoginDTO;
 import vn.jobhunter.domain.response.ResCreateUserDTO;
 import vn.jobhunter.domain.response.ResLoginDTO;
+import vn.jobhunter.domain.request.ReqChangePassDTO;
 import vn.jobhunter.service.UserService;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.annotation.ApiMessage;
 import vn.jobhunter.util.error.IdInvalidException;
+
 
 @RestController
 @RequestMapping("/api/v1")
@@ -191,4 +188,27 @@ public class AuthController {
         User user = this.userService.handleCreateUser(pUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(user));
     }
+
+    @PutMapping("/auth/change-password")
+    @ApiMessage("Change password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ReqChangePassDTO request) {
+        String email = SecurityUtil.getCurrentUserLogin().orElse(null);
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        boolean success = userService.changePassword(
+                email,
+                request.getCurrentPassword(),
+                request.getNewPassword()
+        );
+
+        if (!success) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
 }

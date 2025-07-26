@@ -20,9 +20,9 @@ import java.util.Objects;
 public class FileController {
 
     private final FileService fileService;
-
     @Value("${cloudinary.cloud_name}")
     private String cloudName;
+
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
@@ -33,7 +33,7 @@ public class FileController {
     public ResponseEntity<ResUploadFileDTO> uploadFileToCloudinary(
             @RequestParam("file") MultipartFile file,
             @RequestParam("folder") String folder,
-            @RequestParam("type") String type // "image" hoặc "file"
+            @RequestParam("type") String type
     ) throws IOException, StorageException {
         if (file == null || file.isEmpty()) {
             throw new StorageException("File is empty. Please upload a file");
@@ -58,7 +58,6 @@ public class FileController {
         Map<String, Object> result = fileService.upload(file, folder, type);
         String url = result.get("secure_url").toString();
         Instant uploadedAt = Instant.now();
-        System.out.println(">>> Uploaded to Cloudinary, public_id = " + result.get("public_id"));
 
         return ResponseEntity.ok(new ResUploadFileDTO(url, uploadedAt));
     }
@@ -67,7 +66,7 @@ public class FileController {
     @ApiMessage("Delete file on Cloudinary")
     public ResponseEntity<?> deleteFile(
             @RequestParam("publicId") String publicId,
-            @RequestParam("type") String type // "image" hoặc "file"
+            @RequestParam("type") String type
     ) throws IOException, StorageException {
         if (publicId == null || publicId.isEmpty()) {
             throw new StorageException("Missing required param: publicId");
@@ -82,7 +81,6 @@ public class FileController {
     }
 
     @GetMapping("/files")
-    @ApiMessage("Download file from Cloudinary (return actual file)")
     public ResponseEntity<byte[]> downloadFileDirect(
             @RequestParam("publicId") String publicId,
             @RequestParam("type") String type
@@ -93,12 +91,16 @@ public class FileController {
 
         String resourceType = type.equalsIgnoreCase("file") ? "raw" : "image";
 
-        // Lấy file từ Cloudinary
-        byte[] fileBytes = fileService.downloadFile(publicId, resourceType);
+        // Sử dụng URL đúng cho loại file (image/raw)
+        String url = String.format("https://res.cloudinary.com/%s/%s/upload/%s",
+                cloudName, resourceType, publicId)
+                ;
+        System.out.println(">>> Fetching file from Cloudinary: " + url);
 
-        // Xác định tên file
-        String[] parts = publicId.split("/");
-        String filename = parts[parts.length - 1];
+        byte[] fileBytes = fileService.downloadFileFromUrl(url);
+
+        String filename = publicId.contains("/") ?
+                publicId.substring(publicId.lastIndexOf("/") + 1) : publicId;
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")

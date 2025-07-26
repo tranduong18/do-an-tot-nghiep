@@ -38,24 +38,35 @@ export const callLogout = () => {
     return axios.post<IBackendRes<string>>('/api/v1/auth/logout')
 }
 
+export const callChangePassword = (currentPassword: string, newPassword: string) => {
+    return axios.put<IBackendRes<string>>(
+        "/api/v1/auth/change-password",
+        { currentPassword, newPassword }
+    );
+};
+
 /**
  * Upload single file
  */
-export const callUploadSingleFile = (file: any, folderType: string) => {
+export const callUploadSingleFile = (
+    file: any,
+    folderType: string,
+    fileType: "image" | "file" = "image" // mặc định là "image"
+) => {
     const bodyFormData = new FormData();
-    bodyFormData.append('file', file);
-    bodyFormData.append('folder', folderType);
+    bodyFormData.append("file", file);
+    bodyFormData.append("folder", folderType);
+    bodyFormData.append("type", fileType); // truyền động
 
     return axios<IBackendRes<{ fileName: string }>>({
-        method: 'post',
-        url: '/api/v1/files',
+        method: "post",
+        url: "/api/v1/files",
         data: bodyFormData,
         headers: {
             "Content-Type": "multipart/form-data",
         },
     });
-}
-
+};
 
 
 
@@ -124,6 +135,10 @@ export const callDeleteUser = (id: string) => {
 export const callFetchUser = (query: string) => {
     return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users?${query}`);
 }
+
+export const callGetUserById = (id: string | number) => {
+    return axios.get<IBackendRes<IUser>>(`/api/v1/users/${id}`);
+};
 
 /**
  * 

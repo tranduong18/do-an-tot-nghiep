@@ -1,14 +1,18 @@
 import { Button, Col, Form, Modal, Row, Select, Table, Tabs, message, notification } from "antd";
 import { isMobile } from "react-device-detect";
 import type { TabsProps } from 'antd';
-import { IResume, ISubscribers } from "@/types/backend";
-import { useState, useEffect } from 'react';
+import { IResume, ISubscribers, IUser } from "@/types/backend";
+import { useState, useEffect, useRef } from 'react';
 import { callCreateSubscriber, callFetchAllSkill, callFetchResumeByUser, callGetSubscriberSkills, callUpdateSubscriber } from "@/config/api";
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { MonitorOutlined } from "@ant-design/icons";
 import { SKILLS_LIST } from "@/config/utils";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import UserUpdateInfo from "./user/user.update";
+import { ActionType } from "@ant-design/pro-components";
+import { fetchUserById } from "@/redux/slice/userDetailSlide";
+import UserChangePassword from "./user/user.changePass";
 
 interface IProps {
     open: boolean;
@@ -89,14 +93,6 @@ const UserResume = (props: any) => {
                 loading={isFetching}
                 pagination={false}
             />
-        </div>
-    )
-}
-
-const UserUpdateInfo = (props: any) => {
-    return (
-        <div>
-            //todo
         </div>
     )
 }
@@ -233,10 +229,33 @@ const JobByEmail = (props: any) => {
 
 const ManageAccount = (props: IProps) => {
     const { open, onClose } = props;
+    const [dataInit, setDataInit] = useState<IUser | null>(null);
+    const dispatch = useAppDispatch();
+
+    const tableRef = useRef<ActionType>();
+
+    const reloadTable = () => {
+        tableRef?.current?.reload();
+    }
 
     const onChange = (key: string) => {
         // console.log(key);
     };
+
+    const accountUser = useAppSelector((state) => state.account.user);
+    const userDetail = useAppSelector((state) => state.userDetail.user);
+
+    useEffect(() => {
+        if (open && accountUser.id) {
+            dispatch(fetchUserById(accountUser.id));
+        }
+    }, [open, accountUser.id, dispatch]);
+
+    useEffect(() => {
+        if (open && userDetail) {
+            setDataInit(userDetail as IUser);
+        }
+    }, [open, userDetail]);
 
     const items: TabsProps['items'] = [
         {
@@ -252,12 +271,20 @@ const ManageAccount = (props: IProps) => {
         {
             key: 'user-update-info',
             label: `Cập nhật thông tin`,
-            children: <UserUpdateInfo />,
+            children: <UserUpdateInfo
+                dataInit={dataInit}
+                setDataInit={setDataInit}
+                open={open}
+                onClose={onClose}
+            />,
         },
         {
             key: 'user-password',
             label: `Thay đổi mật khẩu`,
-            children: `//todo`,
+            children: <UserChangePassword
+                open={open}
+                onClose={onClose}
+            />,
         },
     ];
 

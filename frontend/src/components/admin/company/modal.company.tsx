@@ -158,7 +158,7 @@ const ModalCompany = (props: IProps) => {
     };
 
     const handleUploadFileLogo = async ({ file, onSuccess, onError }: any) => {
-        const res = await callUploadSingleFile(file, "company");
+        const res = await callUploadSingleFile(file, "company", "image");
         if (res && res.data) {
             setDataLogo([{
                 name: res.data.fileName,
@@ -199,7 +199,6 @@ const ModalCompany = (props: IProps) => {
                         onFinish={submitCompany}
                         initialValues={dataInit?.id ? dataInit : {}}
                         submitter={{
-                            render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
                             submitButtonProps: {
                                 icon: <CheckSquareOutlined />
                             },
@@ -251,7 +250,7 @@ const ModalCompany = (props: IProps) => {
                                                             uid: uuidv4(),
                                                             name: dataInit?.logo ?? "",
                                                             status: 'done',
-                                                            url: `${import.meta.env.VITE_BACKEND_URL}/storage/company/${dataInit?.logo}`,
+                                                            url: dataInit?.logo,
                                                         }
                                                     ] : []
                                             }

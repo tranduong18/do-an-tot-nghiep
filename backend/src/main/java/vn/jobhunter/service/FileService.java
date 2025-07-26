@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileService {
     private final CloudinaryService cloudinaryService;
+
     @Value("${cloudinary.cloud_name}")
     private String cloudName;
 
@@ -32,13 +33,21 @@ public class FileService {
         return "ok".equals(result.get("result"));
     }
 
-    public byte[] downloadFile(String publicId, String resourceType) throws IOException {
-        String url = String.format("https://res.cloudinary.com/%s/%s/upload/%s",
-                cloudName, resourceType, publicId);
+    public byte[] downloadFile(String publicId) throws IOException {
+        String url = String.format("https://res.cloudinary.com/%s/image/upload/%s.pdf",
+                cloudName, publicId);
         System.out.println(">>> Downloading from Cloudinary URL: " + url);
 
         try (InputStream in = new URL(url).openStream()) {
             return in.readAllBytes();
+        } catch (IOException e) {
+            throw new IOException("Failed to download file from Cloudinary", e);
+        }
+    }
+
+    public byte[] downloadFileFromUrl(String fileUrl) throws IOException {
+        try (InputStream inputStream = new URL(fileUrl).openStream()) {
+            return inputStream.readAllBytes();
         } catch (IOException e) {
             throw new IOException("Failed to download file from Cloudinary", e);
         }

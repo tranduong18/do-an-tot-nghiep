@@ -45,17 +45,9 @@ public class CloudinaryService {
         ));
     }
 
-    public String getUrl(Map<String, Object> result) {
-        return result.get("secure_url").toString();
-    }
-
-    public String getPublicId(Map<String, Object> result) {
-        return result.get("public_id").toString();
-    }
-
     public Map<String, Object> deleteFile(String publicId, String resourceType) throws IOException {
         return cloudinary.uploader().destroy(publicId, ObjectUtils.asMap(
-                "resource_type", resourceType // "image" hoặc "raw"
+                "resource_type", resourceType
         ));
     }
 }

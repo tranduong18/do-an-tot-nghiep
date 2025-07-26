@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.jobhunter.domain.Company;
@@ -23,11 +24,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final CompanyService companyService;
     private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService) {
+    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.companyService = companyService;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User handleCreateUser(User user) {
@@ -86,6 +89,7 @@ public class UserService {
             currentUser.setAddress(reqUser.getAddress());
             currentUser.setGender(reqUser.getGender());
             currentUser.setAge(reqUser.getAge());
+            currentUser.setAvatar(reqUser.getAvatar());
 
             // check company
             if (reqUser.getCompany() != null) {
@@ -125,6 +129,7 @@ public class UserService {
         res.setCreatedAt(user.getCreatedAt());
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
+        res.setAvatar(user.getAvatar());
 
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
@@ -143,6 +148,7 @@ public class UserService {
         res.setUpdatedAt(user.getUpdatedAt());
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
+        res.setAvatar(user.getAvatar());
 
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
@@ -177,6 +183,7 @@ public class UserService {
         res.setCreatedAt(user.getCreatedAt());
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
+        res.setAvatar(user.getAvatar());
         return res;
     }
 
@@ -190,5 +197,18 @@ public class UserService {
 
     public User getUserByRefreshTokenAndEmail(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
+    }
+
+    public boolean changePassword(String email, String currentPassword, String newPassword) {
+        User user = this.userRepository.findByEmail(email);
+        if (user == null) return false;
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
     }
 }

@@ -16,6 +16,7 @@ import {
 } from 'chart.js';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchDashboardData } from '@/redux/slice/dashboardSlice';
+import PageHelmet from "@/components/share/page.helmet";
 
 Chart.register(
     BarElement,
@@ -79,6 +80,10 @@ const DashboardAdmin: React.FC = () => {
 
     return (
         <div>
+            <PageHelmet
+                title="Trang quản trị"
+                description="Thống kê và quản lý hệ thống JobHunter"
+            />
             <Typography.Title level={2}>Tổng quan hệ thống</Typography.Title>
             <Row gutter={16} style={{ marginBottom: 24 }}>
                 <Col span={6}><Card loading={loading}><Statistic title="Người dùng" value={stats.users} prefix={<UserOutlined />} /></Card></Col>

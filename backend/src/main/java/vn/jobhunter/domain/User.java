@@ -35,11 +35,12 @@ public class User {
     private long id;
     private String name;
 
-    @NotBlank(message = "email không được để trống")
+    @NotBlank(message = "Email không được để trống")
     private String email;
-    @NotBlank(message = "password không được để trống")
+    @NotBlank(message = "Password không được để trống")
     private String password;
     private int age;
+    private String avatar;
 
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;

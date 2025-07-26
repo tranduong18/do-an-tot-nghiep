@@ -99,7 +99,6 @@ const ModalRole = (props: IProps) => {
                 form={form}
                 onFinish={submitRole}
                 submitter={{
-                    render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
                     submitButtonProps: {
                         icon: <CheckSquareOutlined />
                     },
