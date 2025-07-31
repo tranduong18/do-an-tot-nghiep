@@ -17,4 +17,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long>,
             "FROM Company c LEFT JOIN c.jobs j " +
             "GROUP BY c.name ORDER BY COUNT(j) DESC")
     List<ResTopCompanyDTO> findTopCompaniesByJobCount();
+
+    List<Company> findTop5ByNameContainingIgnoreCase(String name);
 }

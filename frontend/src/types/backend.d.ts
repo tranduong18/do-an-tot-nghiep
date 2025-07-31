@@ -43,6 +43,11 @@ export interface ICompany {
     address?: string;
     logo: string;
     description?: string;
+    website?: string;
+    size?: string;
+    benefits?: string[];
+    images?: string[];
+
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -63,7 +68,7 @@ export interface ISkill {
 
 
 export interface IUser {
-    id: string;
+    id?: string;
     name: string;
     email: string;
     password?: string;
@@ -95,6 +100,7 @@ export interface IJob {
         id: string;
         name: string;
         logo?: string;
+        address: string
     }
     location: string;
     salary: number;

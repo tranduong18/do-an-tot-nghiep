@@ -20,10 +20,11 @@ const RegisterPage = () => {
             message.success('Đăng ký tài khoản thành công!');
             navigate('/login')
         } else {
+            const errorMsg = Array.isArray(res?.message) ? res.message[0] : res?.message || "Vui lòng kiểm tra lại thông tin.";
             notification.error({
                 message: "Có lỗi xảy ra",
                 description:
-                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                    errorMsg,
                 duration: 5
             })
         }
@@ -61,7 +62,9 @@ const RegisterPage = () => {
                                 } //whole column
                                 label="Email"
                                 name="email"
-                                rules={[{ required: true, message: 'Email không được để trống!' }]}
+                                rules={[{ required: true, message: 'Email không được để trống!' },
+                                { type: 'email', message: 'Email không hợp lệ!' }
+                                ]}
                             >
                                 <Input type='email' />
                             </Form.Item>
@@ -70,7 +73,9 @@ const RegisterPage = () => {
                                 labelCol={{ span: 24 }} //whole column
                                 label="Mật khẩu"
                                 name="password"
-                                rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}
+                                rules={[{ required: true, message: 'Mật khẩu không được để trống!' },
+                                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                                ]}
                             >
                                 <Input.Password />
                             </Form.Item>

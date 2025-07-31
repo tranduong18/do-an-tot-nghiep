@@ -1,19 +1,14 @@
 package vn.jobhunter.controller;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.turkraft.springfilter.boot.Filter;
 
@@ -74,9 +69,29 @@ public class JobController {
     }
 
     @GetMapping("/jobs")
+
+
     @ApiMessage("Get job with pagination")
     public ResponseEntity<ResultPaginationDTO> getAllJob(
             @Filter Specification<Job> spec, Pageable pageable) {
         return ResponseEntity.ok().body(this.jobService.fetchAll(spec, pageable));
+    }
+
+    // ✅ API search
+    @GetMapping("/jobs/search")
+    @ApiMessage("Search job by keyword/skills/location")
+    public ResponseEntity<ResultPaginationDTO> searchJobs(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) List<String> skills,
+            @RequestParam(required = false) List<String> location,
+            Pageable pageable) {
+        return ResponseEntity.ok(jobService.searchJobs(q, skills, location, pageable));
+    }
+
+    // ✅ API suggestions cho autocomplete
+    @GetMapping("/jobs/suggestions")
+    @ApiMessage("Get job/company suggestions")
+    public ResponseEntity<List<Map<String, Object>>> getSuggestions(@RequestParam String q) {
+        return ResponseEntity.ok(jobService.getSuggestions(q));
     }
 }

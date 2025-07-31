@@ -1,6 +1,8 @@
 package vn.jobhunter.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 
 import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Job;
@@ -26,7 +31,7 @@ public class JobService {
     private final CompanyRepository companyRepository;
 
     public JobService(JobRepository jobRepository, SkillRepository skillRepository,
-            CompanyRepository companyRepository) {
+                      CompanyRepository companyRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
         this.companyRepository = companyRepository;
@@ -151,5 +156,73 @@ public class JobService {
         rs.setResult(pageJob.getContent());
 
         return rs;
+    }
+
+    public ResultPaginationDTO searchJobs(String q, List<String> skills, List<String> locations, Pageable pageable) {
+        Specification<Job> spec = Specification.where(null);
+
+        // Lọc theo keyword (job name hoặc company name)
+        if (q != null && !q.isBlank()) {
+            String keyword = q.toLowerCase();
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("name")), "%" + keyword + "%"),
+                    cb.like(cb.lower(root.get("company").get("name")), "%" + keyword + "%")
+            ));
+        }
+
+        // Lọc theo skills (ID hoặc tên)
+        if (skills != null && !skills.isEmpty()) {
+            List<String> normalized = skills.stream().map(String::toLowerCase).toList();
+
+            spec = spec.and((root, query, cb) -> {
+                Join<Object, Object> joinSkill = root.join("skills", JoinType.LEFT);
+                Expression<String> skillName = cb.lower(joinSkill.get("name"));
+                Expression<String> skillId = joinSkill.get("id").as(String.class);
+
+                // Cho phép match nếu tên hoặc id nằm trong danh sách
+                return cb.or(skillName.in(normalized), skillId.in(normalized));
+            });
+        }
+
+        // Lọc theo location
+        if (locations != null && !locations.isEmpty()) {
+            spec = spec.and((root, query, cb) -> root.get("location").in(locations));
+        }
+
+        Page<Job> pageJob = jobRepository.findAll(spec, pageable);
+
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setPages(pageJob.getTotalPages());
+        mt.setTotal(pageJob.getTotalElements());
+
+        rs.setMeta(mt);
+        rs.setResult(pageJob.getContent());
+        return rs;
+    }
+
+    // ✅ API suggestions cho autocomplete (trả job + company)
+    public List<Map<String, Object>> getSuggestions(String q) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        jobRepository.findTop5ByNameContainingIgnoreCase(q)
+                .forEach(j -> result.add(Map.of(
+                        "type", "job",
+                        "id", j.getId(),
+                        "name", j.getName(),   // để frontend convert slug
+                        "value", j.getName()
+                )));
+
+        companyRepository.findTop5ByNameContainingIgnoreCase(q)
+                .forEach(c -> result.add(Map.of(
+                        "type", "company",
+                        "id", c.getId(),
+                        "name", c.getName(),   // để frontend convert slug
+                        "value", c.getName()
+                )));
+
+        return result;
     }
 }

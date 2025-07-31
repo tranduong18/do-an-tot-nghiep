@@ -55,19 +55,25 @@ const UserChangePassword = (props: IProps) => {
                     <ProFormText.Password
                         name="currentPassword"
                         label="Mật khẩu hiện tại"
-                        rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại" }]}
+                        rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại" },
+                        { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                        ]}
                         placeholder="Nhập mật khẩu hiện tại"
                     />
                     <ProFormText.Password
                         name="newPassword"
                         label="Mật khẩu mới"
-                        rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới" }]}
+                        rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới" },
+                        { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                        ]}
                         placeholder="Nhập mật khẩu mới"
                     />
                     <ProFormText.Password
                         name="confirmPassword"
                         label="Xác nhận mật khẩu mới"
-                        rules={[{ required: true, message: "Vui lòng xác nhận mật khẩu mới" }]}
+                        rules={[{ required: true, message: "Vui lòng xác nhận mật khẩu mới" },
+                        { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                        ]}
                         placeholder="Nhập lại mật khẩu mới"
                     />
                 </ProForm>

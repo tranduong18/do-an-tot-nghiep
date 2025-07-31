@@ -164,6 +164,15 @@ export const callFetchJobById = (id: string) => {
     return axios.get<IBackendRes<IJob>>(`/api/v1/jobs/${id}`);
 }
 
+// API search job (filter keyword, skills, location)
+export const callSearchJobs = (params: string) => {
+    return axios.get<IBackendRes<IModelPaginate<IJob>>>(`/api/v1/jobs/search?${params}`);
+};
+
+// API gợi ý keyword (autocomplete)
+export const callFetchSuggestions = (q: string) => {
+    return axios.get(`/api/v1/jobs/suggestions?q=${encodeURIComponent(q)}`);
+};
 /**
  * 
 Module Resume

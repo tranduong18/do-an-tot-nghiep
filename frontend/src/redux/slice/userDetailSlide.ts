@@ -15,7 +15,7 @@ interface IUserState {
     isLoading: boolean;
     error: string;
     user: {
-        id: string;
+        id?: string;
         email: string;
         name: string;
         age: number;

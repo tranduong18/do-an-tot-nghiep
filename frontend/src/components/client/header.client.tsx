@@ -62,6 +62,8 @@ const Header = (props: any) => {
         }
     }
 
+    console.log(user.role.name);
+
     const itemsDropdown = [
         {
             label: <label
@@ -71,7 +73,7 @@ const Header = (props: any) => {
             key: 'manage-account',
             icon: <ContactsOutlined />
         },
-        ...(user.role?.permissions?.length ? [{
+        ...(user.role?.name === "SUPER_ADMIN" || user.role?.name === "HR" ? [{
             label: <Link
                 to={"/admin"}
             >Trang Quản Trị</Link>,
@@ -99,7 +101,7 @@ const Header = (props: any) => {
                         <div style={{ display: "flex", gap: 30 }}>
                             <div className={styles['brand']} >
                                 <img
-                                    src="logo.webp"
+                                    src="/logo.webp"
                                     alt="Trang chủ"
                                     onClick={() => navigate('/')}
                                     title="Trang chủ"

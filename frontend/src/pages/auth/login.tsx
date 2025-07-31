@@ -37,10 +37,10 @@ const LoginPage = () => {
             message.success('Đăng nhập tài khoản thành công!');
             window.location.href = callback ? callback : '/';
         } else {
+            const errorMsg = "Email hoặc mật khẩu không chính xác. Vui lòng thử lại!";
             notification.error({
                 message: "Có lỗi xảy ra",
-                description:
-                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                description: errorMsg,
                 duration: 5
             })
         }
@@ -67,7 +67,10 @@ const LoginPage = () => {
                                 labelCol={{ span: 24 }} //whole column
                                 label="Email"
                                 name="username"
-                                rules={[{ required: true, message: 'Email không được để trống!' }]}
+                                rules={[
+                                    { required: true, message: 'Email không được để trống!' },
+                                    { type: 'email', message: 'Email không hợp lệ!' }
+                                ]}
                             >
                                 <Input />
                             </Form.Item>
@@ -76,7 +79,9 @@ const LoginPage = () => {
                                 labelCol={{ span: 24 }} //whole column
                                 label="Mật khẩu"
                                 name="password"
-                                rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}
+                                rules={[{ required: true, message: 'Mật khẩu không được để trống!' },
+                                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                                ]}
                             >
                                 <Input.Password />
                             </Form.Item>
