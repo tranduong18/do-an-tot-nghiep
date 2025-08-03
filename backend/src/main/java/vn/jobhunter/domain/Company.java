@@ -39,6 +39,38 @@ public class Company {
 
     private String logo;
 
+    private String country;
+
+    private String website;       // Website công ty
+    private String industry;      // Lĩnh vực
+    private String size;          // Quy mô nhân sự (VD: 301-500 nhân viên)
+    private String model;         // Mô hình công ty (Sản phẩm/Dịch vụ...)
+
+    // Thông tin hoạt động
+    private String workingTime;   // Thời gian làm việc (VD: Thứ 2 - Thứ 6)
+    private String overtimePolicy;// Chính sách OT (Có OT/Không có OT)
+
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer openJobs = 0; // Số lượng việc làm đang tuyển
+
+    // Đánh giá
+    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double rating = 0.0;        // Điểm trung bình (VD: 4.8)
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer reviewCount = 0;    // Số lượng đánh giá
+    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double reviewPercent = 0.0; // % khuyến khích làm việc (VD: 98)
+
+    // Nội dung hiển thị thêm
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String benefits;      // Phúc lợi (có thể lưu dạng JSON)
+
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String tags;          // Tags chuyên môn (VD: Java, Agile...) - dạng JSON
+
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer postCount = 0; // Số bài viết (tab Bài viết)
+
     private Instant createdAt;
 
     private Instant updatedAt;

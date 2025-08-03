@@ -345,7 +345,6 @@
   height: 100%;
   border-radius: 10px;
   overflow: hidden;
-  transition: all 0.2s ease-in-out;
   cursor: pointer;
 
   &:hover {
@@ -354,7 +353,7 @@
   }
 
   .company-card-top {
-    background-color: #fafafa;
+    background-color: #FBFBFB;
     padding: 16px;
     text-align: center;
     flex: 1;
@@ -417,7 +416,6 @@
   }
 }
 
-/* ===== Company Header ===== */
 .company-header-card {
   position: relative;
   display: flex;
@@ -447,7 +445,7 @@
 }
 
 .job-card-v2 {
-  background-color: #fff9f5;
+  background-color: #EAEFEF;
   border-radius: 10px;
   padding: 16px;
   display: flex;

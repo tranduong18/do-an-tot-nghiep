@@ -73,19 +73,21 @@ const CompanyCard = ({ showPagination = false }: IProps) => {
                                         <h3 className={styles["company-name"]}>{item.name}</h3>
 
                                         <div className={styles["company-skills"]}>
-                                            {mockSkills
-                                                .slice(0, Math.floor(Math.random() * 4) + 2)
-                                                .map((skill) => (
-                                                    <Tag key={skill} color="blue">
-                                                        {skill}
-                                                    </Tag>
-                                                ))}
+                                            {item.tags &&
+                                                item.tags
+                                                    .split(",")
+                                                    .slice(0, 4)
+                                                    .map((tag) => (
+                                                        <Tag key={tag.trim()} color="blue">
+                                                            {tag.trim()}
+                                                        </Tag>
+                                                    ))}
                                         </div>
                                     </div>
 
                                     <div className={styles["company-card-footer"]}>
                                         <span className={styles["company-location"]}>
-                                            {item.address || "Địa điểm không xác định"}
+                                            {item.country || "Địa điểm không xác định"}
                                         </span>
                                         <span className={styles["company-jobs"]}>
                                             🔥 {mockJobCount[Math.floor(Math.random() * mockJobCount.length)]} việc làm

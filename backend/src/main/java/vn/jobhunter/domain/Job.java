@@ -44,6 +44,14 @@ public class Job {
     private double salary;
     private int quantity;
 
+
+    private String specialization; // Chuyên môn
+    @Column(columnDefinition = "TEXT")
+    private String fields; // Lĩnh vực
+    @Column(columnDefinition = "TEXT")
+    private String address; // Địa chỉ chi tiết
+    private String workType; // Loại hình làm việc
+
     @Enumerated(EnumType.STRING)
     private LevelEnum level;
 

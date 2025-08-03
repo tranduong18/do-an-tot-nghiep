@@ -54,6 +54,7 @@ const Header = (props: any) => {
     };
 
     const handleLogout = async () => {
+        console.log("Đăng xuất");
         const res = await callLogout();
         if (res && res && +res.statusCode === 200) {
             dispatch(setLogoutAction({}));

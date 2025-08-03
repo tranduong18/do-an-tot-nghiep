@@ -1,21 +1,21 @@
 .dflex-pc {
   display: flex;
-  justify-content: space-between; /* Tiêu đề bên trái, link bên phải */
+  justify-content: space-between; 
   align-items: center;
   margin-bottom: 10px;
 }
 
 .title {
-  font-size: 22px;  /* To hơn */
-  font-weight: 700; /* Đậm */
-  color: #000;      /* Màu đen */
+  font-size: 22px;  
+  font-weight: 700; 
+  color: #000;      
   flex: 1;
-  text-align: center; /* Căn giữa tiêu đề */
+  text-align: center; 
 }
 
-/* Link "Xem tất cả" */
+
 .dflex-pc a {
   font-size: 16px;
   font-weight: 500;
-  color: #1677ff; /* Màu xanh giống Ant Design */
+  color: #1677ff; 
 }

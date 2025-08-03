@@ -41,16 +41,26 @@ export interface ICompany {
     id?: string;
     name?: string;
     address?: string;
-    logo: string;
+    logo?: string;
     description?: string;
+    country?: string;
     website?: string;
+    industry?: string;
     size?: string;
-    benefits?: string[];
-    images?: string[];
+    model?: string;
+    workingTime?: string;
+    overtimePolicy?: string;
+    benefits?: string;
+    tags?: string;
+
+
+    openJobs?: number;
+    rating?: number;
+    reviewCount?: number;
+    reviewPercent?: number;
+    postCount?: number;
 
     createdBy?: string;
-    isDeleted?: boolean;
-    deletedAt?: boolean | null;
     createdAt?: string;
     updatedAt?: string;
 }

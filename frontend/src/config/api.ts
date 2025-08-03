@@ -74,13 +74,13 @@ export const callUploadSingleFile = (
  * 
 Module Company
  */
-export const callCreateCompany = (name: string, address: string, description: string, logo: string) => {
-    return axios.post<IBackendRes<ICompany>>('/api/v1/companies', { name, address, description, logo })
-}
+export const callCreateCompany = (data: Partial<ICompany>) => {
+    return axios.post<IBackendRes<ICompany>>("/api/v1/companies", data);
+};
 
-export const callUpdateCompany = (id: string, name: string, address: string, description: string, logo: string) => {
-    return axios.put<IBackendRes<ICompany>>(`/api/v1/companies`, { id, name, address, description, logo })
-}
+export const callUpdateCompany = (id: string, data: Partial<ICompany>) => {
+    return axios.put<IBackendRes<ICompany>>(`/api/v1/companies`, { id, ...data });
+};
 
 export const callDeleteCompany = (id: string) => {
     return axios.delete<IBackendRes<ICompany>>(`/api/v1/companies/${id}`);

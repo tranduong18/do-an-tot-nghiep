@@ -53,6 +53,15 @@ public class CompanyService {
             currentCompany.setName(c.getName());
             currentCompany.setDescription(c.getDescription());
             currentCompany.setAddress(c.getAddress());
+            currentCompany.setCountry(c.getCountry());
+            currentCompany.setWebsite(c.getWebsite());
+            currentCompany.setIndustry(c.getIndustry());
+            currentCompany.setSize(c.getSize());
+            currentCompany.setModel(c.getModel());
+            currentCompany.setWorkingTime(c.getWorkingTime());
+            currentCompany.setOvertimePolicy(c.getOvertimePolicy());
+            currentCompany.setBenefits(c.getBenefits());
+            currentCompany.setTags(c.getTags());
             return this.companyRepository.save(currentCompany);
         }
 
