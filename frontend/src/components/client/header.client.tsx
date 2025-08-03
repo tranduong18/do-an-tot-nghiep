@@ -62,8 +62,6 @@ const Header = (props: any) => {
         }
     }
 
-    console.log(user.role.name);
-
     const itemsDropdown = [
         {
             label: <label

@@ -23,17 +23,18 @@ import {
     HeartOutlined,
     HeartFilled,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
+
 import ApplyModal from "@/components/client/modal/apply.modal";
 
-dayjs.extend(relativeTime);
 
 const ClientJobDetailPage = () => {
     const [jobDetail, setJobDetail] = useState<IJob | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isFavorite, setIsFavorite] = useState(false); // trạng thái tim
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -119,9 +120,7 @@ const ClientJobDetailPage = () => {
                                         </p>
                                         <p>
                                             <HistoryOutlined />{" "}
-                                            {jobDetail.updatedAt
-                                                ? dayjs(jobDetail.updatedAt).locale("vi").fromNow()
-                                                : dayjs(jobDetail.createdAt).locale("vi").fromNow()}
+                                            Đăng {jobDetail.updatedAt ? dayjs(jobDetail.updatedAt).locale("vi").fromNow() : dayjs(jobDetail.createdAt).locale("vi").fromNow()}
                                         </p>
                                     </div>
 

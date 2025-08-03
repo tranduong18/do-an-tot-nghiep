@@ -8,9 +8,8 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { sfIn } from "spring-filter-query-builder";
 import styles from "styles/client.module.scss";
 import jobStyles from "styles/client/client.jobCard.module.scss";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 interface IProps {
@@ -88,7 +87,8 @@ const JobCard = ({ showPagination = false }: IProps) => {
                                 onClick={() => handleViewDetailJob(item)}
                             >
                                 <div className={styles["job-card-header"]}>
-                                    <span>Đăng {item.updatedAt ? dayjs(item.updatedAt).locale("vi").fromNow() : dayjs(item.createdAt).locale("vi").fromNow()}</span>
+                                    <span>Đăng {item.updatedAt ? dayjs(item.updatedAt).locale('vi').fromNow() : dayjs(item.createdAt).locale('vi').fromNow()}</span>
+
                                     <span className={styles["new-badge"]}>NEW FOR YOU</span>
                                 </div>
 

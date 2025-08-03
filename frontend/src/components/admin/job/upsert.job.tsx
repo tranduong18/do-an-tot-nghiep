@@ -11,7 +11,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CheckSquareOutlined } from "@ant-design/icons";
 import enUS from 'antd/lib/locale/en_US';
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { IJob, ISkill } from "@/types/backend";
 
 interface ISkillSelect {
