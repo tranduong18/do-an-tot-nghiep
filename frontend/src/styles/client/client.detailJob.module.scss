@@ -84,3 +84,137 @@
     border-color: red !important;
   }
 }
+
+.job-description {
+  margin-top: 24px;
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #222;
+  }
+
+  .description-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #444;
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+  }
+}
+
+.description-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+
+  &.collapsed {
+    max-height: 1000px; 
+  }
+
+  &.expanded {
+    max-height: none;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+}
+
+// related jobs
+.related-jobs {
+  margin-top: 32px;
+
+  .related-title {
+    font-size: 25px;
+    font-weight: 700;
+    color: #121212;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .related-job-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 240px;
+    border-radius: 10px;
+    background: #f0f7ff; 
+    border: 1px solid #d0e3ff;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      background: #e6f0ff;
+    }
+
+    .job-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+
+      .company-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 6px;
+        background: #fff;
+        border: 1px solid #eee;
+      }
+
+      .job-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a73e8;
+        margin-bottom: 2px;
+      }
+
+      .company-name {
+        font-size: 13px;
+        color: #555;
+      }
+    }
+
+    .posted-time {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 4px;
+    }
+
+    .salary-info {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .job-meta {
+      font-size: 14px;
+      color: #444;
+    }
+  }
+}

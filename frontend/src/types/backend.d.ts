@@ -106,17 +106,29 @@ export interface IJob {
     id?: string;
     name: string;
     skills: ISkill[];
+
     company?: {
         id: string;
         name: string;
         logo?: string;
-        address: string
+        address?: string;
+        size?: string;
+        country?: string
+        workingTime?: string;
+        overtimePolicy?: string;
     }
+
     location: string;
+    address: string
     salary: number;
     quantity: number;
     level: string;
     description: string;
+
+    specialization?: string;
+    fields?: string;
+    workType?: string;
+
     startDate: Date;
     endDate: Date;
     active: boolean;

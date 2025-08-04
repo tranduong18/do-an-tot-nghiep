@@ -1,7 +1,7 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ICompany } from "@/types/backend";
-import { callFetchCompanyById } from "@/config/api";
+import { ICompany, IJob } from "@/types/backend";
+import { callFetchCompanyById, callFetchJobsByCompanyId } from "@/config/api";
 import parse from "html-react-parser";
 import {
     Row,
@@ -14,10 +14,13 @@ import {
     Modal,
     Input,
     Card,
+    Space,
+    Tooltip,
 } from "antd";
-import { EnvironmentOutlined } from "@ant-design/icons";
+import { DollarOutlined, EnvironmentOutlined, HistoryOutlined } from "@ant-design/icons";
 import clientStyle from "@/styles/client.module.scss";
 import styles from "@/styles/client/companyDetail.module.scss";
+import dayjs from "dayjs";
 
 const { TextArea } = Input;
 
@@ -27,8 +30,10 @@ const ClientCompanyDetailPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reviewRating, setReviewRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
+    const [jobList, setJobList] = useState<IJob[]>([]);
 
     const location = useLocation();
+    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
     const id = params?.get("id");
 
@@ -47,6 +52,20 @@ const ClientCompanyDetailPage = () => {
         };
         fetchData();
     }, [id]);
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            if (company?.id) {
+                const res = await callFetchJobsByCompanyId(company.id);
+                if (res?.data) {
+                    setJobList(res.data);
+                }
+            }
+        };
+        fetchJobs();
+    }, [company]);
+
+    console.log(jobList);
 
     if (loading) return <Skeleton active />;
     if (!company) return <p>Không tìm thấy công ty.</p>;
@@ -188,8 +207,65 @@ const ClientCompanyDetailPage = () => {
                     </Tabs.TabPane>
 
                     <Tabs.TabPane tab="Việc đang tuyển" key="3">
-                        <Card>Hiện tại chưa có API lấy danh sách job theo công ty.</Card>
+                        {jobList.length === 0 ? (
+                            <p>Hiện tại công ty chưa có việc nào đang tuyển.</p>
+                        ) : (
+                            <Row gutter={[16, 16]}>
+                                {jobList.map((job) => (
+                                    <Col xs={24} sm={12} lg={8} key={job.id}>
+                                        <Card
+                                            className={styles["job-rectangle"]}
+                                            hoverable
+                                            onClick={() => navigate(`/job/detail?id=${job.id}`)}
+                                        >
+                                            <div className={styles["job-rectangle-body"]}>
+                                                <div className={styles["job-info-left"]}>
+                                                    <p>
+                                                        Đăng{" "}
+                                                        {job.updatedAt
+                                                            ? dayjs(job.updatedAt).locale("vi").fromNow()
+                                                            : dayjs(job.createdAt).locale("vi").fromNow()}
+                                                    </p>
+                                                    <h3 className={styles["job-title"]}>{job.name}</h3>
+                                                    <div className={styles["job-meta"]}>
+                                                        <span>
+                                                            <EnvironmentOutlined />{" "}
+                                                            {job.location}
+                                                        </span>
+                                                    </div>
+                                                    <div className={styles["job-salary"]}>
+                                                        <DollarOutlined />{" "}
+                                                        {job.salary?.toLocaleString()} đ
+                                                    </div>
+
+                                                    <Space wrap style={{ marginTop: 8 }}>
+                                                        {job.skills?.slice(0, 3).map((s) => (
+                                                            <Tag key={s.id}>{s.name}</Tag>
+                                                        ))}
+
+                                                        {job.skills && job.skills.length > 3 && (
+                                                            <Tooltip
+                                                                title={job.skills.slice(3).map((s) => s.name).join(", ")}
+                                                                placement="top"
+                                                            >
+                                                                <Tag>+{job.skills.length - 3}</Tag>
+                                                            </Tooltip>
+                                                        )}
+                                                    </Space>
+                                                </div>
+
+                                                <div className={styles["company-logo"]}>
+                                                    <img src={company.logo} alt="logo" />
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </Col>
+                                ))}
+                            </Row>
+                        )}
                     </Tabs.TabPane>
+
+
 
                     <Tabs.TabPane tab="Đánh giá" key="4">
                         <Card>Chức năng đánh giá công ty sẽ được làm sau.</Card>

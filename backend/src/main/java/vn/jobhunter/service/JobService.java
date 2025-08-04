@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.Skill;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
+import vn.jobhunter.domain.response.job.ResCompanyJobDTO;
 import vn.jobhunter.domain.response.job.ResCreateJobDTO;
+import vn.jobhunter.domain.response.job.ResSimilarJobDTO;
 import vn.jobhunter.domain.response.job.ResUpdateJobDTO;
 import vn.jobhunter.repository.CompanyRepository;
 import vn.jobhunter.repository.JobRepository;
 import vn.jobhunter.repository.SkillRepository;
+import vn.jobhunter.util.error.IdInvalidException;
 
 @Service
 public class JobService {
@@ -74,6 +78,10 @@ public class JobService {
         dto.setActive(currentJob.isActive());
         dto.setCreatedAt(currentJob.getCreatedAt());
         dto.setCreatedBy(currentJob.getCreatedBy());
+        dto.setSpecialization(currentJob.getSpecialization());
+        dto.setFields(currentJob.getFields());
+        dto.setAddress(currentJob.getAddress());
+        dto.setWorkType(currentJob.getWorkType());
 
         if (currentJob.getSkills() != null) {
             List<String> skills = currentJob.getSkills().stream().map(item -> item.getName())
@@ -109,6 +117,10 @@ public class JobService {
         jobInDB.setStartDate(j.getStartDate());
         jobInDB.setEndDate(j.getEndDate());
         jobInDB.setActive(j.isActive());
+        jobInDB.setSpecialization(j.getSpecialization());
+        jobInDB.setFields(j.getFields());
+        jobInDB.setAddress(j.getAddress());
+        jobInDB.setWorkType(j.getWorkType());
 
         // update job
         Job currentJob = this.jobRepository.save(jobInDB);
@@ -124,6 +136,10 @@ public class JobService {
         dto.setStartDate(currentJob.getStartDate());
         dto.setEndDate(currentJob.getEndDate());
         dto.setActive(currentJob.isActive());
+        dto.setSpecialization(currentJob.getSpecialization());
+        dto.setFields(currentJob.getFields());
+        dto.setAddress(currentJob.getAddress());
+        dto.setWorkType(currentJob.getWorkType());
         dto.setUpdatedAt(currentJob.getUpdatedAt());
         dto.setUpdatedBy(currentJob.getUpdatedBy());
 
@@ -225,4 +241,89 @@ public class JobService {
 
         return result;
     }
+
+    public List<ResSimilarJobDTO> findSimilarJobs(long jobId) throws IdInvalidException {
+        Job currentJob = jobRepository.findById(jobId)
+                .orElseThrow(() -> new IdInvalidException("Job not found"));
+
+        List<Long> skillIds = currentJob.getSkills().stream()
+                .map(Skill::getId)
+                .toList();
+
+        Pageable limit = PageRequest.of(0, 8); // ✅ Giới hạn 8 job
+
+        List<Job> jobs = jobRepository.findSimilarJobs(skillIds, currentJob.getLocation(), jobId, limit);
+
+        return jobs.stream().map(job -> {
+            ResSimilarJobDTO dto = new ResSimilarJobDTO();
+            dto.setId(job.getId());
+            dto.setName(job.getName());
+            dto.setLocation(job.getLocation());
+            dto.setSalary(job.getSalary());
+            dto.setSpecialization(job.getSpecialization());
+            dto.setWorkType(job.getWorkType());
+            dto.setCreatedAt(job.getCreatedAt());
+            dto.setUpdatedAt(job.getUpdatedAt());
+
+            // Company
+            if (job.getCompany() != null) {
+                ResSimilarJobDTO.CompanyDTO companyDTO = new ResSimilarJobDTO.CompanyDTO();
+                companyDTO.setId(job.getCompany().getId());
+                companyDTO.setName(job.getCompany().getName());
+                companyDTO.setLogo(job.getCompany().getLogo());
+                dto.setCompany(companyDTO);
+            }
+
+            // Skills
+            if (job.getSkills() != null) {
+                List<ResSimilarJobDTO.SkillDTO> skillList = job.getSkills().stream().map(skill -> {
+                    ResSimilarJobDTO.SkillDTO s = new ResSimilarJobDTO.SkillDTO();
+                    s.setId(skill.getId());
+                    s.setName(skill.getName());
+                    return s;
+                }).toList();
+                dto.setSkills(skillList);
+            }
+
+            return dto;
+        }).toList();
+    }
+
+
+    public List<ResCompanyJobDTO> findJobsByCompanyAsDTO(long companyId) {
+        List<Job> jobs = jobRepository.findByCompanyId(companyId);
+
+        return jobs.stream().map(job -> {
+            ResCompanyJobDTO dto = new ResCompanyJobDTO();
+            dto.setId(job.getId());
+            dto.setName(job.getName());
+            dto.setLocation(job.getLocation());
+            dto.setSalary(job.getSalary());
+            dto.setSpecialization(job.getSpecialization());
+            dto.setWorkType(job.getWorkType());
+            dto.setCreatedAt(job.getCreatedAt());
+            dto.setUpdatedAt(job.getUpdatedAt());
+
+            if (job.getCompany() != null) {
+                ResCompanyJobDTO.CompanyDTO c = new ResCompanyJobDTO.CompanyDTO();
+                c.setId(job.getCompany().getId());
+                c.setName(job.getCompany().getName());
+                c.setLogo(job.getCompany().getLogo());
+                dto.setCompany(c);
+            }
+
+            if (job.getSkills() != null) {
+                List<ResCompanyJobDTO.SkillDTO> skills = job.getSkills().stream().map(s -> {
+                    ResCompanyJobDTO.SkillDTO sd = new ResCompanyJobDTO.SkillDTO();
+                    sd.setId(s.getId());
+                    sd.setName(s.getName());
+                    return sd;
+                }).toList();
+                dto.setSkills(skills);
+            }
+
+            return dto;
+        }).toList();
+    }
+
 }

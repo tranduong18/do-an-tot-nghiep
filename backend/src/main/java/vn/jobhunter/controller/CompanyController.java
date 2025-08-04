@@ -6,11 +6,15 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.jobhunter.domain.Company;
+import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
+import vn.jobhunter.domain.response.job.ResCompanyJobDTO;
 import vn.jobhunter.service.CompanyService;
+import vn.jobhunter.service.JobService;
 import vn.jobhunter.util.annotation.ApiMessage;
 import vn.jobhunter.util.error.IdInvalidException;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -29,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1")
 public class CompanyController {
     private final CompanyService companyService;
+    private final JobService jobService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, JobService jobService) {
         this.companyService = companyService;
+        this.jobService = jobService;
     }
 
     @PostMapping("/companies")
@@ -68,5 +74,13 @@ public class CompanyController {
     public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
         this.companyService.handleDeleteCompany(id);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/companies/{id}/jobs")
+    @ApiMessage("Get jobs by company")
+    public ResponseEntity<List<ResCompanyJobDTO>> getJobsByCompanyDTO(
+            @PathVariable("id") long companyId
+    ) {
+        return ResponseEntity.ok(jobService.findJobsByCompanyAsDTO(companyId));
     }
 }

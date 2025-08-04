@@ -25,6 +25,11 @@ public class ResUpdateJobDTO {
     private Instant endDate;
     private boolean isActive;
 
+    private String specialization;
+    private String fields;
+    private String address;
+    private String workType;
+
     private List<String> skills;
 
     private Instant updatedAt;

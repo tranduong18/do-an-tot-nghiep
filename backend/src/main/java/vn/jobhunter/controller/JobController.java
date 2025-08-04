@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
 import vn.jobhunter.domain.response.job.ResCreateJobDTO;
+import vn.jobhunter.domain.response.job.ResSimilarJobDTO;
 import vn.jobhunter.domain.response.job.ResUpdateJobDTO;
 import vn.jobhunter.service.JobService;
 import vn.jobhunter.util.annotation.ApiMessage;
@@ -93,5 +94,11 @@ public class JobController {
     @ApiMessage("Get job/company suggestions")
     public ResponseEntity<List<Map<String, Object>>> getSuggestions(@RequestParam String q) {
         return ResponseEntity.ok(jobService.getSuggestions(q));
+    }
+
+    @GetMapping("/jobs/{id}/similar")
+    @ApiMessage("Get similar jobs")
+    public ResponseEntity<List<ResSimilarJobDTO>> getSimilarJobs(@PathVariable("id") long id) throws IdInvalidException {
+        return ResponseEntity.ok(jobService.findSimilarJobs(id));
     }
 }

@@ -93,6 +93,9 @@ export const callFetchCompany = (query: string) => {
 export const callFetchCompanyById = (id: string) => {
     return axios.get<IBackendRes<ICompany>>(`/api/v1/companies/${id}`);
 }
+export const callFetchJobsByCompanyId = (companyId: string) => {
+    return axios.get<IBackendRes<IJob[]>>(`/api/v1/companies/${companyId}/jobs`);
+};
 
 /**
  * 
@@ -163,6 +166,11 @@ export const callFetchJob = (query: string) => {
 export const callFetchJobById = (id: string) => {
     return axios.get<IBackendRes<IJob>>(`/api/v1/jobs/${id}`);
 }
+
+export const callFetchSimilarJobs = (id: string) => {
+    return axios.get<IBackendRes<IJob[]>>(`/api/v1/jobs/${id}/similar`);
+};
+
 
 // API search job (filter keyword, skills, location)
 export const callSearchJobs = (params: string) => {

@@ -93,3 +93,65 @@
     color: #222;
   }
 }
+
+// Việc đang tuyển
+.job-rectangle {
+  padding: 12px;
+  border-radius: 10px;
+  height: 100%;
+  background: #f0f7ff; 
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .job-rectangle-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .job-info-left {
+    flex: 1;
+
+    .job-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 6px;
+    }
+
+    .job-meta {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .job-salary {
+      color: #f5222d;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .job-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .ant-tag {
+        font-size: 12px;
+        padding: 0 8px;
+        border-radius: 12px;
+      }
+    }
+  }
+
+  .company-logo {
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+  }
+}

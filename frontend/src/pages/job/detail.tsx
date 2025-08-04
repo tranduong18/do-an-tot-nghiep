@@ -1,8 +1,7 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { IJob } from "@/types/backend";
-import { callFetchJobById } from "@/config/api";
-import styles from "styles/client.module.scss";
+import { callFetchJobById, callFetchSimilarJobs } from "@/config/api";
 import jobStyles from "styles/client/client.detailJob.module.scss";
 import parse from "html-react-parser";
 import {
@@ -15,6 +14,7 @@ import {
     Tag,
     Button,
     Space,
+    Tooltip,
 } from "antd";
 import {
     DollarOutlined,
@@ -22,21 +22,27 @@ import {
     HistoryOutlined,
     HeartOutlined,
     HeartFilled,
+    ScheduleOutlined,
+    LaptopOutlined,
+    BankOutlined,
 } from "@ant-design/icons";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
-
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { convertSlug } from "@/config/utils";
 import ApplyModal from "@/components/client/modal/apply.modal";
 
+dayjs.extend(relativeTime);
 
 const ClientJobDetailPage = () => {
     const [jobDetail, setJobDetail] = useState<IJob | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [showFullDesc, setShowFullDesc] = useState(false);
+    const [relatedJobs, setRelatedJobs] = useState<IJob[]>([]);
 
     const location = useLocation();
+    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
     const id = params?.get("id");
 
@@ -50,6 +56,16 @@ const ClientJobDetailPage = () => {
             }
         };
         init();
+    }, [id]);
+
+    useEffect(() => {
+        const fetchRelatedJobs = async () => {
+            if (id) {
+                const res = await callFetchSimilarJobs(id);
+                if (res?.data) setRelatedJobs(res.data);
+            }
+        };
+        fetchRelatedJobs();
     }, [id]);
 
     const toggleFavorite = () => {
@@ -116,12 +132,21 @@ const ClientJobDetailPage = () => {
 
                                     <div className={jobStyles["job-meta"]}>
                                         <p>
-                                            <EnvironmentOutlined /> {jobDetail.location}
+                                            <EnvironmentOutlined />{" "}
+                                            {jobDetail.address || jobDetail.location}
                                         </p>
                                         <p>
                                             <HistoryOutlined />{" "}
-                                            Đăng {jobDetail.updatedAt ? dayjs(jobDetail.updatedAt).locale("vi").fromNow() : dayjs(jobDetail.createdAt).locale("vi").fromNow()}
+                                            Đăng{" "}
+                                            {jobDetail.updatedAt
+                                                ? dayjs(jobDetail.updatedAt).locale("vi").fromNow()
+                                                : dayjs(jobDetail.createdAt).locale("vi").fromNow()}
                                         </p>
+                                        {jobDetail.workType && (
+                                            <p>
+                                                <strong>Hình thức:</strong> {jobDetail.workType}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <Divider />
@@ -137,20 +162,120 @@ const ClientJobDetailPage = () => {
                                         </Space>
                                     </div>
 
-                                    <div style={{ marginTop: 16 }}>
-                                        <h4>Chuyên môn:</h4>
-                                        <Tag className={jobStyles["tag-info"]}>Quản trị cơ sở dữ liệu</Tag>
-                                    </div>
+                                    {jobDetail.specialization && (
+                                        <div style={{ marginTop: 16 }}>
+                                            <h4>Chuyên môn:</h4>
+                                            <Tag className={jobStyles["tag-info"]}>
+                                                {jobDetail.specialization}
+                                            </Tag>
+                                        </div>
+                                    )}
 
-                                    <div style={{ marginTop: 16 }}>
-                                        <h4>Lĩnh vực:</h4>
-                                        <Tag className={jobStyles["tag-info"]}>Phần cứng & Điện toán</Tag>
-                                    </div>
+                                    {jobDetail.fields && (
+                                        <div style={{ marginTop: 16 }}>
+                                            <h4>Lĩnh vực:</h4>
+                                            {jobDetail.fields.split(",").map((field, idx) => (
+                                                <Tag key={idx} className={jobStyles["tag-info"]}>
+                                                    {field.trim()}
+                                                </Tag>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     <Divider />
 
-                                    {parse(jobDetail.description)}
+                                    <div className={jobStyles["job-description"]}>
+                                        <h3 className={jobStyles["section-title"]}>Mô tả công việc</h3>
+                                        <div
+                                            className={`${jobStyles["description-content"]} ${showFullDesc ? jobStyles["expanded"] : jobStyles["collapsed"]
+                                                }`}
+                                        >
+                                            {parse(jobDetail.description)}
+                                        </div>
+
+                                        <div style={{ textAlign: "center", marginTop: 8 }}>
+                                            <Button
+                                                type="link"
+                                                onClick={() => setShowFullDesc((prev) => !prev)}
+                                                style={{ padding: 0 }}
+                                            >
+                                                {showFullDesc ? "Rút gọn ▲" : "Xem thêm ▼"}
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </Card>
+
+                                {relatedJobs.length > 0 && (
+                                    <div className={jobStyles["related-jobs"]}>
+                                        <h3 className={jobStyles["related-title"]}>Việc làm tương tự dành cho bạn</h3>
+
+                                        <Row gutter={[16, 16]}>
+                                            {relatedJobs.map((job) => (
+                                                <Col xs={24} md={12} key={job.id}>
+                                                    <Card
+                                                        className={jobStyles["related-job-card"]}
+                                                        hoverable
+                                                        onClick={() => navigate(`/job/detail?id=${job.id}`)}
+                                                    >
+                                                        <p className={jobStyles["posted-time"]}>
+                                                            Đăng {job.updatedAt
+                                                                ? dayjs(job.updatedAt).locale("vi").fromNow()
+                                                                : dayjs(job.createdAt).locale("vi").fromNow()}
+
+                                                        </p>
+                                                        <div className={jobStyles["job-card-header"]}>
+                                                            <img
+                                                                src={job.company?.logo || "/default-logo.png"}
+                                                                alt="logo"
+                                                                className={jobStyles["company-logo"]}
+                                                            />
+                                                            <div>
+                                                                <h4 className={jobStyles["job-title"]}>{job.name}</h4>
+                                                                <p className={jobStyles["company-name"]}>{job.company?.name}</p>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <p className={jobStyles["salary-info"]}>
+                                                            <DollarOutlined />{" "}
+                                                            {job.salary
+                                                                ? job.salary.toLocaleString() + " đ"
+                                                                : "Đăng nhập để xem mức lương"}
+                                                        </p>
+
+                                                        <p className={jobStyles["job-meta"]}>
+                                                            <EnvironmentOutlined />{" "}
+                                                            {job.location}
+                                                        </p>
+
+                                                        {job.workType && (
+                                                            <p className={jobStyles["job-meta"]} style={{ marginTop: 5 }}>
+                                                                <BankOutlined />{" "}
+                                                                {job.workType}
+                                                            </p>
+                                                        )}
+
+                                                        <Space wrap style={{ marginTop: 8 }}>
+                                                            {job.skills?.slice(0, 4).map((s) => (
+                                                                <Tag key={s.id}>{s.name}</Tag>
+                                                            ))}
+                                                            {job.skills && job.skills.length > 4 && (
+                                                                <Tooltip
+                                                                    title={job.skills.slice(4).map((s) => s.name).join(", ")}
+                                                                    placement="top"
+                                                                >
+                                                                    <Tag>+{job.skills.length - 4}</Tag>
+                                                                </Tooltip>
+                                                            )}
+                                                        </Space>
+                                                    </Card>
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    </div>
+                                )}
+
                             </Col>
 
                             {/* RIGHT */}
@@ -171,14 +296,35 @@ const ClientJobDetailPage = () => {
                                             {jobDetail.company?.address || "Chưa cập nhật"}
                                         </p>
                                         <p>
-                                            <strong>Quy mô:</strong> 1-50 nhân viên
+                                            <strong>Quy mô:</strong>{" "}
+                                            {jobDetail.company?.size || "Chưa cập nhật"}
                                         </p>
                                         <p>
-                                            <strong>Quốc gia:</strong> 🇻🇳 Việt Nam
+                                            <strong>Quốc gia:</strong>{" "}
+                                            {jobDetail.company?.country || "🇻🇳 Việt Nam"}
+                                        </p>
+                                        <p>
+                                            <strong>Thời gian làm việc:</strong>{" "}
+                                            {jobDetail.company?.workingTime || "🇻🇳 Việt Nam"}
+                                        </p>
+                                        <p>
+                                            <strong>Làm việc ngoài giờ:</strong>{" "}
+                                            {jobDetail.company?.overtimePolicy || "🇻🇳 Việt Nam"}
                                         </p>
                                     </div>
 
-                                    <Button block>Xem công ty</Button>
+                                    <Button
+                                        type="primary"
+                                        block
+                                        onClick={() => {
+                                            if (jobDetail.company) {
+                                                const slug = convertSlug(jobDetail.company.name || "");
+                                                navigate(`/company/${slug}?id=${jobDetail.company.id}`);
+                                            }
+                                        }}
+                                    >
+                                        Xem công ty
+                                    </Button>
                                 </Card>
                             </Col>
                         </Row>
