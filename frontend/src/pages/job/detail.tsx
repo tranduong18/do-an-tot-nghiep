@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { convertSlug } from "@/config/utils";
 import ApplyModal from "@/components/client/modal/apply.modal";
+import PageHelmet from "@/components/share/page.helmet";
 
 dayjs.extend(relativeTime);
 
@@ -75,6 +76,7 @@ const ClientJobDetailPage = () => {
 
     return (
         <div className={jobStyles["job-detail-container"]}>
+            <PageHelmet title={jobDetail?.name || "Chi tiết công việc"} />
             {isLoading ? (
                 <Skeleton />
             ) : (

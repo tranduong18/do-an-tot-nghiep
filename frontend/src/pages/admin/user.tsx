@@ -14,6 +14,7 @@ import ViewDetailUser from "@/components/admin/user/view.user";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfLike } from "spring-filter-query-builder";
+import PageHelmet from "@/components/share/page.helmet";
 
 const UserPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -205,6 +206,7 @@ const UserPage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý người dùng" />
             <Access
                 permission={ALL_PERMISSIONS.USERS.GET_PAGINATE}
             >

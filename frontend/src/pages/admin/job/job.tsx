@@ -13,6 +13,7 @@ import { fetchJob } from "@/redux/slice/jobSlide";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfIn } from "spring-filter-query-builder";
+import PageHelmet from "@/components/share/page.helmet";
 
 const JobPage = () => {
     const tableRef = useRef<ActionType>();
@@ -229,6 +230,7 @@ const JobPage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý việc làm" />
             <Access
                 permission={ALL_PERMISSIONS.JOBS.GET_PAGINATE}
             >

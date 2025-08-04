@@ -14,6 +14,7 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
 import { groupByPermission } from "@/config/utils";
+import PageHelmet from "@/components/share/page.helmet";
 
 const RolePage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -208,6 +209,7 @@ const RolePage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý vai trò" />
             <Access
                 permission={ALL_PERMISSIONS.ROLES.GET_PAGINATE}
             >

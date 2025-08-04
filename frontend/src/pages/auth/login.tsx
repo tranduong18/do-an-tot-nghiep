@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setUserLoginInfo } from '@/redux/slice/accountSlide';
 import styles from 'styles/auth.module.scss';
 import { useAppSelector } from '@/redux/hooks';
+import PageHelmet from '@/components/share/page.helmet';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -48,62 +49,65 @@ const LoginPage = () => {
 
 
     return (
-        <div className={styles["login-page"]}>
-            <main className={styles.main}>
-                <div className={styles.container}>
-                    <section className={styles.wrapper}>
-                        <div className={styles.heading}>
-                            <h2 className={`${styles.text} ${styles["text-large"]}`}>Đăng Nhập</h2>
-                            <Divider />
+        <>
+            <PageHelmet title={"Đăng nhập"} />
+            <div className={styles["login-page"]}>
+                <main className={styles.main}>
+                    <div className={styles.container}>
+                        <section className={styles.wrapper}>
+                            <div className={styles.heading}>
+                                <h2 className={`${styles.text} ${styles["text-large"]}`}>Đăng Nhập</h2>
+                                <Divider />
 
-                        </div>
-                        <Form
-                            name="basic"
-                            // style={{ maxWidth: 600, margin: '0 auto' }}
-                            onFinish={onFinish}
-                            autoComplete="off"
-                        >
-                            <Form.Item
-                                labelCol={{ span: 24 }} //whole column
-                                label="Email"
-                                name="username"
-                                rules={[
-                                    { required: true, message: 'Email không được để trống!' },
-                                    { type: 'email', message: 'Email không hợp lệ!' }
-                                ]}
+                            </div>
+                            <Form
+                                name="basic"
+                                // style={{ maxWidth: 600, margin: '0 auto' }}
+                                onFinish={onFinish}
+                                autoComplete="off"
                             >
-                                <Input />
-                            </Form.Item>
+                                <Form.Item
+                                    labelCol={{ span: 24 }} //whole column
+                                    label="Email"
+                                    name="username"
+                                    rules={[
+                                        { required: true, message: 'Email không được để trống!' },
+                                        { type: 'email', message: 'Email không hợp lệ!' }
+                                    ]}
+                                >
+                                    <Input />
+                                </Form.Item>
 
-                            <Form.Item
-                                labelCol={{ span: 24 }} //whole column
-                                label="Mật khẩu"
-                                name="password"
-                                rules={[{ required: true, message: 'Mật khẩu không được để trống!' },
-                                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
-                                ]}
-                            >
-                                <Input.Password />
-                            </Form.Item>
+                                <Form.Item
+                                    labelCol={{ span: 24 }} //whole column
+                                    label="Mật khẩu"
+                                    name="password"
+                                    rules={[{ required: true, message: 'Mật khẩu không được để trống!' },
+                                    { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                                    ]}
+                                >
+                                    <Input.Password />
+                                </Form.Item>
 
-                            <Form.Item
-                            // wrapperCol={{ offset: 6, span: 16 }}
-                            >
-                                <Button type="primary" htmlType="submit" loading={isSubmit}>
-                                    Đăng nhập
-                                </Button>
-                            </Form.Item>
-                            <Divider>Or</Divider>
-                            <p className="text text-normal">Chưa có tài khoản ?
-                                <span>
-                                    <Link to='/register' > Đăng Ký </Link>
-                                </span>
-                            </p>
-                        </Form>
-                    </section>
-                </div>
-            </main>
-        </div>
+                                <Form.Item
+                                // wrapperCol={{ offset: 6, span: 16 }}
+                                >
+                                    <Button type="primary" htmlType="submit" loading={isSubmit}>
+                                        Đăng nhập
+                                    </Button>
+                                </Form.Item>
+                                <Divider>Or</Divider>
+                                <p className="text text-normal">Chưa có tài khoản ?
+                                    <span>
+                                        <Link to='/register' > Đăng Ký </Link>
+                                    </span>
+                                </p>
+                            </Form>
+                        </section>
+                    </div>
+                </main>
+            </div>
+        </>
     )
 }
 

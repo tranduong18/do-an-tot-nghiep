@@ -81,7 +81,7 @@ const DashboardAdmin: React.FC = () => {
     return (
         <div>
             <PageHelmet
-                title="Trang quản trị"
+                title="Trang quản trị - Thống kê"
                 description="Thống kê và quản lý hệ thống JobHunter"
             />
             <Typography.Title level={2}>Tổng quan hệ thống</Typography.Title>

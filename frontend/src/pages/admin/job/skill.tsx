@@ -1,4 +1,3 @@
-
 import DataTable from "@/components/client/data-table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ISkill } from "@/types/backend";
@@ -12,6 +11,7 @@ import queryString from 'query-string';
 import { sfLike } from "spring-filter-query-builder";
 import { fetchSkill } from "@/redux/slice/skillSlide";
 import ModalSkill from "@/components/admin/skill/modal.skill";
+import PageHelmet from "@/components/share/page.helmet";
 
 const SkillPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -180,6 +180,7 @@ const SkillPage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý kỹ năng" />
             <DataTable<ISkill>
                 actionRef={tableRef}
                 headerTitle="Danh sách Skill"

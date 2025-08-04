@@ -14,6 +14,7 @@ import ModalPermission from "@/components/admin/permission/modal.permission";
 import { colorMethod } from "@/config/utils";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
+import PageHelmet from "@/components/share/page.helmet";
 
 const PermissionPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -211,6 +212,7 @@ const PermissionPage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý quyền hạn" />
             <Access
                 permission={ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE}
             >

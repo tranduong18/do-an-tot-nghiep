@@ -13,6 +13,7 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
 import { EditOutlined } from "@ant-design/icons";
+import PageHelmet from "@/components/share/page.helmet";
 
 const ResumePage = () => {
     const tableRef = useRef<ActionType>();
@@ -199,6 +200,7 @@ const ResumePage = () => {
 
     return (
         <div>
+            <PageHelmet title="Quản lý hồ sơ" />
             <Access
                 permission={ALL_PERMISSIONS.RESUMES.GET_PAGINATE}
             >
