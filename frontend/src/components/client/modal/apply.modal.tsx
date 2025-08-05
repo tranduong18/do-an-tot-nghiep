@@ -34,7 +34,6 @@ const ApplyModal = (props: IProps) => {
             navigate(`/login?callback=${window.location.href}`)
         }
         else {
-            //todo
             if (jobDetail) {
                 const res = await callCreateResume(urlCV, jobDetail?.id, user.email, user.id);
                 if (res.data) {

@@ -22,8 +22,6 @@ import {
     HistoryOutlined,
     HeartOutlined,
     HeartFilled,
-    ScheduleOutlined,
-    LaptopOutlined,
     BankOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";

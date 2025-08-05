@@ -182,8 +182,8 @@ const ViewUpsertJob = () => {
                 <Breadcrumb
                     separator=">"
                     items={[
-                        { title: <Link to="/admin/job">Manage Job</Link> },
-                        { title: "Upsert Job" },
+                        { title: <Link to="/admin/job">Quản lý việc làm</Link> },
+                        { title: "Tạo mới việc làm" },
                     ]}
                 />
             </div>
@@ -206,7 +206,7 @@ const ViewUpsertJob = () => {
                     <Row gutter={[20, 20]}>
                         <Col span={24} md={12}>
                             <ProFormText
-                                label="Tên Job"
+                                label="Tên việc làm"
                                 name="name"
                                 rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                 placeholder="Nhập tên job"
@@ -391,7 +391,7 @@ const ViewUpsertJob = () => {
                         <Col span={24}>
                             <ProForm.Item
                                 name="description"
-                                label="Miêu tả job"
+                                label="Miêu tả"
                                 rules={[
                                     { required: true, message: "Vui lòng nhập miêu tả job!" },
                                 ]}

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
@@ -18,6 +19,7 @@ import jakarta.persistence.criteria.JoinType;
 import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.Skill;
+import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
 import vn.jobhunter.domain.response.job.ResCompanyJobDTO;
 import vn.jobhunter.domain.response.job.ResCreateJobDTO;
@@ -26,6 +28,8 @@ import vn.jobhunter.domain.response.job.ResUpdateJobDTO;
 import vn.jobhunter.repository.CompanyRepository;
 import vn.jobhunter.repository.JobRepository;
 import vn.jobhunter.repository.SkillRepository;
+import vn.jobhunter.repository.UserRepository;
+import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.error.IdInvalidException;
 
 @Service
@@ -33,12 +37,14 @@ public class JobService {
     private final JobRepository jobRepository;
     private final SkillRepository skillRepository;
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     public JobService(JobRepository jobRepository, SkillRepository skillRepository,
-                      CompanyRepository companyRepository) {
+                      CompanyRepository companyRepository, UserRepository userRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
         this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
     }
 
     public Optional<Job> fetchJobById(long id) {
@@ -46,6 +52,13 @@ public class JobService {
     }
 
     public ResCreateJobDTO create(Job j) {
+        User currentUser = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin().orElseThrow());
+
+        if ("HR".equals(currentUser.getRole().getName()) &&
+                j.getCompany() != null &&
+                j.getCompany().getId() != currentUser.getCompany().getId()) {
+            throw new AccessDeniedException("Bạn không có quyền tạo job cho công ty khác");
+        }
         // check skills
         if (j.getSkills() != null) {
             List<Long> reqSkills = j.getSkills().stream().map(x -> x.getId()).collect(Collectors.toList());
@@ -93,6 +106,12 @@ public class JobService {
     }
 
     public ResUpdateJobDTO update(Job j, Job jobInDB) {
+        User currentUser = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin().orElseThrow());
+
+        if ("HR".equals(currentUser.getRole().getName()) &&
+                jobInDB.getCompany().getId() != currentUser.getCompany().getId()) {
+            throw new AccessDeniedException("Bạn không có quyền sửa job này");
+        }
         // check skills
         if (j.getSkills() != null) {
             List<Long> reqSkills = j.getSkills().stream().map(x -> x.getId()).collect(Collectors.toList());
@@ -152,11 +171,27 @@ public class JobService {
         return dto;
     }
 
-    public void delete(long id) {
+    public void delete(long id) throws IdInvalidException {
+        User currentUser = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin().orElseThrow());
+        Job existing = jobRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Job không tồn tại"));
+
+        if ("HR".equals(currentUser.getRole().getName()) &&
+                existing.getCompany().getId() != currentUser.getCompany().getId()) {
+            throw new AccessDeniedException("Bạn không có quyền xóa job này");
+        }
         this.jobRepository.deleteById(id);
     }
 
-    public ResultPaginationDTO fetchAll(Specification<Job> spec, Pageable pageable) {
+    public ResultPaginationDTO fetchAll(Specification<Job> spec, Pageable pageable, String adminView) {
+        User currentUser = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin().orElseThrow());
+
+        if ("true".equalsIgnoreCase(adminView) && "HR".equals(currentUser.getRole().getName())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("company").get("id"), currentUser.getCompany().getId())
+            );
+        }
+
         Page<Job> pageJob = this.jobRepository.findAll(spec, pageable);
 
         ResultPaginationDTO rs = new ResultPaginationDTO();

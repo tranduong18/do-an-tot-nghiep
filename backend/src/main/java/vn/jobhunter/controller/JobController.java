@@ -44,7 +44,6 @@ public class JobController {
         if (currentJob.isEmpty()) {
             throw new IdInvalidException("Job not found");
         }
-
         return ResponseEntity.ok().body(this.jobService.update(job, currentJob.get()));
     }
 
@@ -70,12 +69,12 @@ public class JobController {
     }
 
     @GetMapping("/jobs")
-
-
     @ApiMessage("Get job with pagination")
     public ResponseEntity<ResultPaginationDTO> getAllJob(
-            @Filter Specification<Job> spec, Pageable pageable) {
-        return ResponseEntity.ok().body(this.jobService.fetchAll(spec, pageable));
+            @Filter Specification<Job> spec,
+            Pageable pageable,
+            @RequestHeader(value = "X-Admin-View", required = false) String adminView) {
+        return ResponseEntity.ok().body(this.jobService.fetchAll(spec, pageable, adminView));
     }
 
     // ✅ API search

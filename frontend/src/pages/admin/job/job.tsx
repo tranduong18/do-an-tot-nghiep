@@ -78,7 +78,7 @@ const JobPage = () => {
             },
         },
         {
-            title: 'Level',
+            title: 'Trình độ',
             dataIndex: 'level',
             renderFormItem: (item, props, form) => (
                 <ProFormSelect
@@ -110,7 +110,7 @@ const JobPage = () => {
         },
 
         {
-            title: 'CreatedAt',
+            title: 'Thời gian tạo',
             dataIndex: 'createdAt',
             width: 200,
             sorter: true,
@@ -122,7 +122,7 @@ const JobPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'UpdatedAt',
+            title: 'Thời gian cập nhật',
             dataIndex: 'updatedAt',
             width: 200,
             sorter: true,
@@ -135,7 +135,7 @@ const JobPage = () => {
         },
         {
 
-            title: 'Actions',
+            title: 'Hành động',
             hideInSearch: true,
             width: 50,
             render: (_value, entity, _index, _action) => (

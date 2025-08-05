@@ -36,6 +36,11 @@ instance.interceptors.request.use(function (config) {
         config.headers.Accept = "application/json";
         config.headers["Content-Type"] = "application/json; charset=utf-8";
     }
+    // ✅ Thêm header X-Admin-View khi đang ở trang quản trị
+    if (typeof window !== "undefined") {
+        const isAdminPage = window.location.pathname.includes("/admin/");
+        config.headers["X-Admin-View"] = isAdminPage ? "true" : "false";
+    }
     return config;
 });
 
