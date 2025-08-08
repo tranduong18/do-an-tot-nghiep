@@ -54,13 +54,19 @@ const UserResume = (props: any) => {
 
         },
         {
-            title: 'Job title',
+            title: 'Việc ứng tuyển',
             dataIndex: ["job", "name"],
 
         },
         {
             title: 'Trạng thái',
             dataIndex: "status",
+            render: (v) => {
+                const color =
+                    v === 'APPROVED' ? 'green' :
+                        v === 'REJECTED' ? 'red' : 'gold';
+                return <span style={{ color, fontWeight: 600 }}>{v}</span>;
+            }
         },
         {
             title: 'Ngày rải CV',
@@ -77,7 +83,7 @@ const UserResume = (props: any) => {
             render(value, record, index) {
                 return (
                     <a
-                        href={`${import.meta.env.VITE_BACKEND_URL}/storage/resume/${record?.url}`}
+                        href={record?.url}
                         target="_blank"
                     >Chi tiết</a>
                 )

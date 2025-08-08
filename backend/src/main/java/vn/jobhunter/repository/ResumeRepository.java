@@ -8,5 +8,5 @@ import vn.jobhunter.domain.Resume;
 
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Long>, JpaSpecificationExecutor<Resume> {
-
+    boolean existsByUser_IdAndJob_Id(Long userId, Long jobId);
 }

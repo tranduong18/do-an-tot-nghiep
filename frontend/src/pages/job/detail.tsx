@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { IJob } from "@/types/backend";
-import { callFetchJobById, callFetchSimilarJobs } from "@/config/api";
+import { callFetchJobById, callFetchSimilarJobs, callFetchResumeByUser } from "@/config/api";
 import jobStyles from "styles/client/client.detailJob.module.scss";
 import parse from "html-react-parser";
 import {
@@ -29,6 +29,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { convertSlug } from "@/config/utils";
 import ApplyModal from "@/components/client/modal/apply.modal";
 import PageHelmet from "@/components/share/page.helmet";
+import { useAppSelector } from "@/redux/hooks";
 
 dayjs.extend(relativeTime);
 
@@ -39,7 +40,9 @@ const ClientJobDetailPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [relatedJobs, setRelatedJobs] = useState<IJob[]>([]);
+    const [isApplied, setIsApplied] = useState(false);
 
+    const isAuthenticated = useAppSelector(state => state.account.isAuthenticated);
     const location = useLocation();
     const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
@@ -67,6 +70,26 @@ const ClientJobDetailPage = () => {
         fetchRelatedJobs();
     }, [id]);
 
+    useEffect(() => {
+        const checkApplied = async () => {
+            if (!isAuthenticated || !id) return;
+
+            try {
+                const res = await callFetchResumeByUser();
+                if (res && res.data) {
+                    const applied = res.data.result.some(
+                        (resume: any) => resume.job?.id === Number(id)
+                    );
+                    setIsApplied(applied);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        checkApplied();
+    }, [isAuthenticated, id]);
+
     const toggleFavorite = () => {
         setIsFavorite((prev) => !prev);
         // TODO: Sau này gọi API lưu job yêu thích ở đây
@@ -90,7 +113,10 @@ const ClientJobDetailPage = () => {
                             {/* LEFT */}
                             <Col xs={24} md={18}>
                                 <Card className={jobStyles["job-card"]}>
-                                    <h1 className={jobStyles["job-title"]}>{jobDetail.name}</h1>
+                                    <h1 className={jobStyles["job-title"]}>
+                                        {jobDetail.name}
+                                        {isApplied && <Tag color="green" style={{ marginLeft: 8 }}>ĐÃ ỨNG TUYỂN</Tag>}
+                                    </h1>
                                     <p className={jobStyles["company-name"]}>
                                         {jobDetail.company?.name}
                                     </p>
@@ -110,9 +136,12 @@ const ClientJobDetailPage = () => {
                                             danger
                                             block
                                             size="large"
-                                            onClick={() => setIsModalOpen(true)}
+                                            onClick={() => {
+                                                if (isApplied) return;
+                                                setIsModalOpen(true);
+                                            }}
                                         >
-                                            Ứng tuyển
+                                            {isApplied ? "Đã ứng tuyển" : "Ứng tuyển"}
                                         </Button>
 
                                         <Button

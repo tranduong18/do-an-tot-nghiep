@@ -35,8 +35,10 @@ const ApplyModal = (props: IProps) => {
         }
         else {
             if (jobDetail) {
+                console.log("Url: ", urlCV);
                 const res = await callCreateResume(urlCV, jobDetail?.id, user.email, user.id);
                 if (res.data) {
+                    console.log("URl cv hien tai la: ", res.data.url);
                     message.success("Rải CV thành công!");
                     setIsModalOpen(false);
                 } else {
@@ -54,8 +56,9 @@ const ApplyModal = (props: IProps) => {
         multiple: false,
         accept: "application/pdf,application/msword, .doc, .docx, .pdf",
         async customRequest({ file, onSuccess, onError }: any) {
-            const res = await callUploadSingleFile(file, "resume");
+            const res = await callUploadSingleFile(file, "resume", "file");
             if (res && res.data) {
+                console.log("Filename: ", res.data.fileName);
                 setUrlCV(res.data.fileName);
                 if (onSuccess) onSuccess('ok')
             } else {

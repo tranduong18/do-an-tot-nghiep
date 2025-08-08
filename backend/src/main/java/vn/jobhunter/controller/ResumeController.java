@@ -36,6 +36,12 @@ public class ResumeController {
         if (!isIdExist) {
             throw new IdInvalidException("User id/Job id không tồn tại.");
         }
+        Long userId = resume.getUser().getId();
+        Long jobId  = resume.getJob().getId();
+        if (resumeService.isDuplicate(userId, jobId)) {
+            throw new IdInvalidException("Bạn đã ứng tuyển job này rồi");
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(this.resumeService.create(resume));
     }
 

@@ -81,6 +81,7 @@ public class ResumeService {
 
         ResCreateResumeDTO res = new ResCreateResumeDTO();
         res.setId(resume.getId());
+        res.setUrl(resume.getUrl());
         res.setCreatedBy(resume.getCreatedBy());
         res.setCreatedAt(resume.getCreatedAt());
         return res;
@@ -105,6 +106,10 @@ public class ResumeService {
         res.setUpdatedAt(existing.getUpdatedAt());
         res.setUpdatedBy(existing.getUpdatedBy());
         return res;
+    }
+
+    public boolean isDuplicate(Long userId, Long jobId) {
+        return resumeRepository.existsByUser_IdAndJob_Id(userId, jobId);
     }
 
     // ✅ Delete với kiểm tra quyền
