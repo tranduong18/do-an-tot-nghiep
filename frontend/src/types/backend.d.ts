@@ -140,6 +140,23 @@ export interface IJob {
     updatedAt?: string;
 }
 
+export interface IFavoriteItem {
+    jobId: string;
+    name: string;
+    location: string;
+    salary: number;
+    specialization?: string;
+    workType?: string;
+
+    favoritedAt: string;
+
+    companyId?: string;
+    companyName?: string;
+    companyLogo?: string;
+
+    skills?: string[];
+}
+
 export interface IResume {
     id?: string;
     email: string;

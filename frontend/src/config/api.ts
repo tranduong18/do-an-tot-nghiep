@@ -1,4 +1,4 @@
-import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers } from '@/types/backend';
+import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem } from '@/types/backend';
 import axios from 'config/axios-customize';
 
 // View Dashboard
@@ -293,4 +293,21 @@ export const callFetchSubscriber = (query: string) => {
 export const callFetchSubscriberById = (id: string) => {
     return axios.get<IBackendRes<ISubscribers>>(`/api/v1/subscribers/${id}`);
 }
+
+/**
+ * 
+Module Favorite Job
+ */
+
+export const callFavoriteToggle = (jobId: number | string) =>
+    axios.post<IBackendRes<boolean>>(`/api/v1/favorites/${jobId}/toggle`);
+
+export const callFavoriteIsFavorited = (jobId: number | string) =>
+    axios.get<IBackendRes<boolean>>(`/api/v1/favorites/is-favorited`, { params: { jobId } });
+
+export const callFavoriteMyList = (query: string) =>
+    axios.get<IBackendRes<IModelPaginate<IFavoriteItem>>>(`/api/v1/favorites?${query}`);
+
+export const callFavoriteDelete = (jobId: number | string) =>
+    axios.delete<IBackendRes<void>>(`/api/v1/favorites/${jobId}`);
 

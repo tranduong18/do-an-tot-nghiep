@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { IJob } from "@/types/backend";
-import { callFetchJobById, callFetchSimilarJobs, callFetchResumeByUser } from "@/config/api";
+import { callFetchJobById, callFetchSimilarJobs, callFetchResumeByUser, callFavoriteIsFavorited, callFavoriteToggle } from "@/config/api";
 import jobStyles from "styles/client/client.detailJob.module.scss";
 import parse from "html-react-parser";
 import {
@@ -15,6 +15,7 @@ import {
     Button,
     Space,
     Tooltip,
+    message,
 } from "antd";
 import {
     DollarOutlined,
@@ -37,7 +38,10 @@ const ClientJobDetailPage = () => {
     const [jobDetail, setJobDetail] = useState<IJob | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [isFavorite, setIsFavorite] = useState(false);
+    const [favLoading, setFavLoading] = useState(false);
+
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [relatedJobs, setRelatedJobs] = useState<IJob[]>([]);
     const [isApplied, setIsApplied] = useState(false);
@@ -48,6 +52,7 @@ const ClientJobDetailPage = () => {
     const params = new URLSearchParams(location.search);
     const id = params?.get("id");
 
+    // load job detail
     useEffect(() => {
         const init = async () => {
             if (id) {
@@ -60,6 +65,7 @@ const ClientJobDetailPage = () => {
         init();
     }, [id]);
 
+    // load related jobs
     useEffect(() => {
         const fetchRelatedJobs = async () => {
             if (id) {
@@ -90,9 +96,49 @@ const ClientJobDetailPage = () => {
         checkApplied();
     }, [isAuthenticated, id]);
 
-    const toggleFavorite = () => {
-        setIsFavorite((prev) => !prev);
-        // TODO: Sau này gọi API lưu job yêu thích ở đây
+    useEffect(() => {
+        const initFav = async () => {
+            if (!isAuthenticated || !id) {
+                setIsFavorite(false);
+                return;
+            }
+            try {
+                const res = await callFavoriteIsFavorited(id);
+                if (res?.data !== undefined) {
+                    const flag = (res as any)?.data?.data ?? res.data;
+                    setIsFavorite(!!flag);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        initFav();
+    }, [isAuthenticated, id]);
+
+    const toggleFavorite = async () => {
+        if (!id) return;
+        if (!isAuthenticated) {
+            message.info("Vui lòng đăng nhập để lưu việc làm yêu thích");
+            navigate("/login?redirect=" + encodeURIComponent(location.pathname + location.search));
+            return;
+        }
+
+        const prev = isFavorite;
+        setIsFavorite(!prev);
+        setFavLoading(true);
+
+        try {
+            const res = await callFavoriteToggle(id);
+            const serverFlag = (res as any)?.data?.data ?? res.data;
+            if (typeof serverFlag === "boolean") setIsFavorite(serverFlag);
+            message.success(serverFlag ? "Đã thêm vào yêu thích" : "Đã bỏ khỏi yêu thích");
+        } catch (e) {
+            setIsFavorite(prev);
+            message.error("Có lỗi khi cập nhật yêu thích. Thử lại sau.");
+            console.error(e);
+        } finally {
+            setFavLoading(false);
+        }
     };
 
     return (
@@ -146,6 +192,7 @@ const ClientJobDetailPage = () => {
 
                                         <Button
                                             shape="circle"
+                                            loading={favLoading}
                                             icon={
                                                 isFavorite ? (
                                                     <HeartFilled style={{ color: "red" }} />

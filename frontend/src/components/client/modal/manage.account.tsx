@@ -1,18 +1,19 @@
-import { Button, Col, Form, Modal, Row, Select, Table, Tabs, message, notification } from "antd";
+import { Avatar, Button, Col, Form, Modal, Popconfirm, Row, Select, Space, Table, Tabs, Tag, message, notification } from "antd";
 import { isMobile } from "react-device-detect";
 import type { TabsProps } from 'antd';
-import { IResume, ISubscribers, IUser } from "@/types/backend";
+import { IFavoriteItem, IResume, ISubscribers, IUser } from "@/types/backend";
 import { useState, useEffect, useRef } from 'react';
-import { callCreateSubscriber, callFetchAllSkill, callFetchResumeByUser, callGetSubscriberSkills, callUpdateSubscriber } from "@/config/api";
+import { callCreateSubscriber, callFavoriteDelete, callFavoriteMyList, callFetchAllSkill, callFetchResumeByUser, callGetSubscriberSkills, callUpdateSubscriber } from "@/config/api";
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { MonitorOutlined } from "@ant-design/icons";
+import { DollarOutlined, EnvironmentOutlined, HeartFilled, MonitorOutlined } from "@ant-design/icons";
 import { SKILLS_LIST } from "@/config/utils";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import UserUpdateInfo from "./user/user.update";
 import { ActionType } from "@ant-design/pro-components";
 import { fetchUserById } from "@/redux/slice/userDetailSlide";
 import UserChangePassword from "./user/user.changePass";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
     open: boolean;
@@ -102,6 +103,138 @@ const UserResume = (props: any) => {
         </div>
     )
 }
+
+const UserFavoriteJobs = () => {
+    const [data, setData] = useState<IFavoriteItem[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
+    const navigate = useNavigate();
+
+    const fetchData = async (p = page, s = pageSize) => {
+        setLoading(true);
+        try {
+            const query = `page=${p - 1}&size=${s}`;
+            const res = await callFavoriteMyList(query);
+            if (res && res.data) {
+                setData(res.data.result || []);
+                setTotal(res.data.meta?.total || 0);
+            }
+        } catch (e: any) {
+            message.error("Không tải được danh sách yêu thích");
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData(1, pageSize);
+    }, []);
+
+    const handleUnfavorite = async (jobId: string) => {
+        try {
+            await callFavoriteDelete(jobId);
+            message.success("Đã bỏ khỏi yêu thích");
+            // nếu trang hiện tại hết dữ liệu sau khi xóa, lùi 1 trang
+            const remain = data.length - 1;
+            const nextPage = remain === 0 && page > 1 ? page - 1 : page;
+            setPage(nextPage);
+            fetchData(nextPage, pageSize);
+        } catch (e) {
+            message.error("Không thể cập nhật yêu thích. Thử lại sau.");
+        }
+    };
+
+    const columns: ColumnsType<IFavoriteItem> = [
+        {
+            title: "STT",
+            key: "idx",
+            width: 60,
+            align: "center",
+            render: (_t, _r, idx) => (page - 1) * pageSize + idx + 1,
+        },
+        {
+            title: "Công ty",
+            dataIndex: "companyName",
+            render: (_: any, record) => (
+                <Space>
+
+                    <span style={{ fontWeight: 600 }}>{record.companyName}</span>
+                </Space>
+            ),
+        },
+        {
+            title: "Công việc",
+            dataIndex: "name",
+            render: (v: string, record) => (
+                <a onClick={() => navigate(`/job/detail?id=${record.jobId}`)}>{v}</a>
+            ),
+        },
+        {
+            title: "Địa điểm",
+            dataIndex: "location",
+            render: (v: string) => (
+                <Space><EnvironmentOutlined />{v}</Space>
+            ),
+        },
+        {
+            title: "Mức lương",
+            dataIndex: "salary",
+            render: (v: number) => (
+                <Space><DollarOutlined />{(v ?? 0).toLocaleString()} đ</Space>
+            ),
+        },
+        {
+            title: "Hình thức",
+            dataIndex: "workType",
+            render: (v?: string) => (v ? <Tag>{v}</Tag> : null),
+        },
+        {
+            title: "Đã lưu",
+            dataIndex: "favoritedAt",
+            render: (v: string) => dayjs(v).format("DD-MM-YYYY HH:mm"),
+        },
+        {
+            title: "",
+            key: "actions",
+            width: 50,
+            align: "right",
+            render: (_t, record) => (
+                <Popconfirm
+                    title="Bỏ yêu thích công việc này?"
+                    okText="Bỏ thích"
+                    cancelText="Hủy"
+                    onConfirm={() => handleUnfavorite(record.jobId)}
+                >
+                    <HeartFilled style={{ color: "red", fontSize: 18, cursor: "pointer" }} />
+                </Popconfirm>
+            ),
+        },
+    ];
+
+    return (
+        <Table<IFavoriteItem>
+            rowKey={(r) => r.jobId}
+            columns={columns}
+            dataSource={data}
+            loading={loading}
+            pagination={{
+                current: page,
+                pageSize,
+                total,
+                showSizeChanger: true,
+                onChange: (p, s) => {
+                    setPage(p);
+                    setPageSize(s);
+                    fetchData(p, s);
+                },
+            }}
+        />
+    );
+};
+
 
 const JobByEmail = (props: any) => {
     const [form] = Form.useForm();
@@ -291,6 +424,11 @@ const ManageAccount = (props: IProps) => {
                 open={open}
                 onClose={onClose}
             />,
+        },
+        {
+            key: 'user-favorites',
+            label: `Việc đã yêu thích`,
+            children: <UserFavoriteJobs />,
         },
     ];
 
