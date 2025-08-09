@@ -1,6 +1,8 @@
 package vn.jobhunter.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
 import vn.jobhunter.repository.CompanyRepository;
+import vn.jobhunter.repository.JobRepository;
 import vn.jobhunter.repository.UserRepository;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.error.IdInvalidException;
@@ -21,10 +24,12 @@ import vn.jobhunter.util.error.IdInvalidException;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final JobRepository jobRepository;
 
-    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository) {
+    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository, JobRepository jobRepository) {
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
+        this.jobRepository = jobRepository;
     }
 
     // Tạo công ty
@@ -52,6 +57,17 @@ public class CompanyService {
         }
 
         Page<Company> pCompany = this.companyRepository.findAll(spec, pageable);
+
+        List<Object[]> rows = this.jobRepository.countOpenJobsGroupByCompany();
+        Map<Long, Integer> openJobsMap = new HashMap<>();
+        for (Object[] r : rows) {
+            Long companyId = (Long) r[0];
+            Long cnt = (Long) r[1];
+            openJobsMap.put(companyId, cnt.intValue());
+        }
+        pCompany.getContent().forEach(c ->
+                c.setOpenJobs(openJobsMap.getOrDefault(c.getId(), 0))
+        );
 
         ResultPaginationDTO rs = new ResultPaginationDTO();
         ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();

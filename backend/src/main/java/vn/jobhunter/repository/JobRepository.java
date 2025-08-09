@@ -27,4 +27,13 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     List<Job> findByCompanyId(@Param("companyId") long companyId);
 
     List<Job> findTop5ByNameContainingIgnoreCase(String name);
+
+    @Query("""
+        select j.company.id, count(j)
+        from Job j
+        where j.active = true
+          and (j.endDate is null or j.endDate >= CURRENT_TIMESTAMP)
+        group by j.company.id
+    """)
+    List<Object[]> countOpenJobsGroupByCompany();
 }

@@ -224,3 +224,17 @@ export interface ISubscribers {
     createdAt?: string;
     updatedAt?: string;
 }
+
+export interface IReview {
+    id: string;
+    rating: number;
+    content?: string;
+    recommended: boolean;
+    createdAt: string;
+    company: {
+        id: number; name: string
+    };
+    user: {
+        id: string; fullName: string; avatar: string
+    };
+}

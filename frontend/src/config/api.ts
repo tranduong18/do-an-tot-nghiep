@@ -1,4 +1,4 @@
-import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem } from '@/types/backend';
+import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview } from '@/types/backend';
 import axios from 'config/axios-customize';
 
 // View Dashboard
@@ -311,3 +311,44 @@ export const callFavoriteMyList = (query: string) =>
 export const callFavoriteDelete = (jobId: number | string) =>
     axios.delete<IBackendRes<void>>(`/api/v1/favorites/${jobId}`);
 
+/**
+ * Module Company Review
+ * Backend: recommended tự tính theo rating >= 4
+ */
+
+export const callFetchCompanyReviews = (
+    companyId: number | string,
+    page = 0,
+    size = 10
+) =>
+    axios.get<IBackendRes<IModelPaginate<IReview>>>(
+        `/api/v1/companies/${companyId}/reviews`,
+        { params: { page, size, sort: "createdAt,DESC" } }
+    );
+
+export const callCreateCompanyReview = (
+    companyId: number | string,
+    payload: { rating: number; content?: string }
+) =>
+    axios.post<IBackendRes<IReview>>(
+        `/api/v1/companies/${companyId}/reviews`,
+        payload
+    );
+
+export const callUpdateCompanyReview = (
+    companyId: number | string,
+    reviewId: number | string,
+    payload: { rating: number; content?: string }
+) =>
+    axios.put<IBackendRes<IReview>>(
+        `/api/v1/companies/${companyId}/reviews/${reviewId}`,
+        payload
+    );
+
+export const callDeleteCompanyReview = (
+    companyId: number | string,
+    reviewId: number | string
+) =>
+    axios.delete<IBackendRes<void>>(
+        `/api/v1/companies/${companyId}/reviews/${reviewId}`
+    );

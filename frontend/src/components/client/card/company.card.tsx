@@ -10,8 +10,6 @@ interface IProps {
     showPagination?: boolean;
 }
 
-// Mock data skill và job count
-const mockSkills = ["JavaScript", "ReactJS", "Python", "NodeJS", "Java", "MySQL"];
 const mockJobCount = [4, 8, 12, 3, 6, 10];
 
 const CompanyCard = ({ showPagination = false }: IProps) => {
@@ -90,7 +88,7 @@ const CompanyCard = ({ showPagination = false }: IProps) => {
                                             {item.country || "Địa điểm không xác định"}
                                         </span>
                                         <span className={styles["company-jobs"]}>
-                                            🔥 {mockJobCount[Math.floor(Math.random() * mockJobCount.length)]} việc làm
+                                            🔥 {item.openJobs ?? 0} việc làm
                                         </span>
                                     </div>
                                 </Card>
