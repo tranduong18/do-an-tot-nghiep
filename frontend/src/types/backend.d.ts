@@ -265,3 +265,27 @@ export interface IBlog {
         country?: string;
     } | null;
 }
+
+// Forget Password
+export interface IForgotPasswordRequest {
+    email: string;
+}
+
+export interface IVerifyOtpRequest {
+    email: string;
+    otp: string;
+}
+
+export interface IResetPasswordRequest {
+    resetToken: string;
+    newPassword: string;
+}
+
+export interface IMessageDTO {
+    message: string;
+}
+
+export interface IResetTokenDTO {
+    resetToken: string;
+    expiresInMinutes: number;
+}

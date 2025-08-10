@@ -33,6 +33,7 @@ import ClientCompanyDetailPage from './pages/company/detail';
 import JobTabs from './pages/admin/job/job.tabs';
 import ClientBlogPage from './pages/blog';
 import ClientBlogDetailPage from './pages/blog/detail';
+import ForgotPasswordPage from './pages/auth/forgot-password';
 
 const LayoutClient = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -167,6 +168,10 @@ export default function App() {
     {
       path: "/register",
       element: <RegisterPage />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPasswordPage />,
     },
   ]);
 

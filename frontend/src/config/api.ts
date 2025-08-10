@@ -1,4 +1,4 @@
-import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview, IBlog } from '@/types/backend';
+import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview, IBlog, IMessageDTO, IResetTokenDTO } from '@/types/backend';
 import axios from 'config/axios-customize';
 
 // View Dashboard
@@ -395,3 +395,22 @@ export const callFetchRelatedBlogs = (id: string | number, size = 6) =>
 
 export const callFetchBlogsByCompanyId = (companyId: string | number, query?: string,) =>
     axios.get<IBackendRes<IModelPaginate<IBlog>>>(`/api/v1/blogs/${companyId}/blogs?${query}`);
+
+/**
+ * Module Forgot Password (OTP) 
+ */
+export const callPasswordOtpRequest = (email: string) => {
+    return axios.post<IBackendRes<IMessageDTO>>(`/api/v1/auth/password/otp/request`, { email });
+};
+
+export const callPasswordOtpResend = (email: string) => {
+    return axios.post<IBackendRes<IMessageDTO>>(`/api/v1/auth/password/otp/resend`, { email });
+};
+
+export const callPasswordOtpVerify = (email: string, otp: string) => {
+    return axios.post<IBackendRes<IResetTokenDTO>>(`/api/v1/auth/password/otp/verify`, { email, otp });
+};
+
+export const callPasswordReset = (resetToken: string, newPassword: string) => {
+    return axios.post<IBackendRes<IMessageDTO>>(`/api/v1/auth/password/reset`, { resetToken, newPassword });
+};

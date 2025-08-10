@@ -89,6 +89,11 @@ const LoginPage = () => {
                                     <Input.Password />
                                 </Form.Item>
 
+                                {/* Link quên mật khẩu */}
+                                <div style={{ textAlign: 'right', marginTop: -8, marginBottom: 16 }}>
+                                    <Link to="/forgot-password">Quên mật khẩu?</Link>
+                                </div>
+
                                 <Form.Item
                                 // wrapperCol={{ offset: 6, span: 16 }}
                                 >
