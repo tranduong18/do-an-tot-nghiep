@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Role;
 
 @Getter
@@ -24,6 +25,7 @@ public class ResLoginDTO {
         private String email;
         private String name;
         private Role role;
+        private Company company;
     }
 
     @Getter

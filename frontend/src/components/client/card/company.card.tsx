@@ -10,8 +10,6 @@ interface IProps {
     showPagination?: boolean;
 }
 
-const mockJobCount = [4, 8, 12, 3, 6, 10];
-
 const CompanyCard = ({ showPagination = false }: IProps) => {
     const [companies, setCompanies] = useState<ICompany[]>([]);
     const [loading, setLoading] = useState(false);

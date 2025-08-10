@@ -10,6 +10,7 @@ import {
     AliwangwangOutlined,
     BugOutlined,
     ScheduleOutlined,
+    FileTextOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, message, Avatar, Button } from 'antd';
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -70,6 +71,12 @@ const LayoutAdmin = () => {
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
             )
 
+            const viewBlog = permissions?.find(
+                (item) =>
+                    item.apiPath === ALL_PERMISSIONS.BLOGS.GET_PAGINATE.apiPath &&
+                    item.method === ALL_PERMISSIONS.BLOGS.GET_PAGINATE.method
+            );
+
             const full = [
                 {
                     label: <Link to='/admin'>Tổng quan</Link>,
@@ -108,9 +115,13 @@ const LayoutAdmin = () => {
                     key: '/admin/role',
                     icon: <ExceptionOutlined />
                 }] : []),
-
-
-
+                ...(viewBlog || ACL_ENABLE === 'false'
+                    ? [{
+                        label: <Link to='/admin/blog'>Quản lý blog</Link>,
+                        key: '/admin/blog',
+                        icon: <FileTextOutlined />
+                    }]
+                    : []),
             ];
 
             setMenuItems(full);

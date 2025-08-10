@@ -18,6 +18,7 @@ import HomePage from 'pages/home';
 import styles from 'styles/app.module.scss';
 import DashboardPage from './pages/admin/dashboard';
 import CompanyPage from './pages/admin/company';
+import BlogPage from './pages/admin/blog';
 import PermissionPage from './pages/admin/permission';
 import ResumePage from './pages/admin/resume';
 import RolePage from './pages/admin/role';
@@ -30,6 +31,8 @@ import ClientJobDetailPage from './pages/job/detail';
 import ClientCompanyPage from './pages/company';
 import ClientCompanyDetailPage from './pages/company/detail';
 import JobTabs from './pages/admin/job/job.tabs';
+import ClientBlogPage from './pages/blog';
+import ClientBlogDetailPage from './pages/blog/detail';
 
 const LayoutClient = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,7 +81,9 @@ export default function App() {
         { path: "job", element: <ClientJobPage /> },
         { path: "job/:id", element: <ClientJobDetailPage /> },
         { path: "company", element: <ClientCompanyPage /> },
-        { path: "company/:id", element: <ClientCompanyDetailPage /> }
+        { path: "company/:id", element: <ClientCompanyDetailPage /> },
+        { path: "blog", element: <ClientBlogPage /> },
+        { path: "blog/:id", element: <ClientBlogDetailPage /> },
       ],
     },
 
@@ -142,7 +147,14 @@ export default function App() {
             <ProtectedRoute>
               <RolePage />
             </ProtectedRoute>
-        }
+        },
+        {
+          path: "blog",
+          element:
+            <ProtectedRoute>
+              <BlogPage />
+            </ProtectedRoute>
+        },
       ],
     },
 

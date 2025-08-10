@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { callGetUserById } from "@/config/api";
-import { IUser } from "@/types/backend";
 
 // Thunk để fetch user theo ID
 export const fetchUserById = createAsyncThunk(

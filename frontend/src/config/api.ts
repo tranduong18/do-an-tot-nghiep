@@ -1,4 +1,4 @@
-import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview } from '@/types/backend';
+import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview, IBlog } from '@/types/backend';
 import axios from 'config/axios-customize';
 
 // View Dashboard
@@ -352,3 +352,46 @@ export const callDeleteCompanyReview = (
     axios.delete<IBackendRes<void>>(
         `/api/v1/companies/${companyId}/reviews/${reviewId}`
     );
+
+/**
+ * Module Blog
+ */
+export const callBlogList = (query: string, adminView?: boolean) =>
+    axios.get<IBackendRes<IModelPaginate<IBlog>>>(`/api/v1/blogs?${query}`, {
+        headers: adminView ? { "X-Admin-View": "true" } : undefined,
+    });
+
+export const callBlogGetById = (id: string) =>
+    axios.get<IBackendRes<IBlog>>(`/api/v1/blogs/${id}`);
+
+export const callBlogGetBySlug = (slug: string) =>
+    axios.get<IBackendRes<IBlog>>(`/api/v1/blogs/slug/${slug}`);
+
+export const callBlogCreate = (payload: {
+    title: string;
+    description?: string;
+    content: string;
+    thumbnail: string;
+    published?: boolean;
+    companyId: number;
+}) =>
+    axios.post<IBackendRes<IBlog>>(`/api/v1/blogs`, payload);
+
+export const callBlogUpdate = (payload: {
+    id: number;
+    title: string;
+    description?: string;
+    content: string;
+    thumbnail: string;
+    published?: boolean;
+    companyId: number;
+}) =>
+    axios.put<IBackendRes<IBlog>>(`/api/v1/blogs`, payload);
+
+export const callBlogDelete = (id: number) =>
+    axios.delete<IBackendRes<void>>(`/api/v1/blogs/${id}`);
+export const callFetchRelatedBlogs = (id: string | number, size = 6) =>
+    axios.get<IBackendRes<IBlog[]>>(`/api/v1/blogs/${id}/related?size=${size}`);
+
+export const callFetchBlogsByCompanyId = (companyId: string | number, query?: string,) =>
+    axios.get<IBackendRes<IModelPaginate<IBlog>>>(`/api/v1/blogs/${companyId}/blogs?${query}`);

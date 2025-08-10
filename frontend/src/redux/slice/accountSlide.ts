@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { callFetchAccount } from '@/config/api';
+import { IAccount } from '@/types/backend';
 
 // First, create the thunk
 export const fetchAccount = createAsyncThunk(
     'account/fetchAccount',
     async () => {
         const response = await callFetchAccount();
-        return response.data;
+        return response.data as IAccount;
     }
 )
 
@@ -29,6 +30,10 @@ interface IState {
                 method: string;
                 module: string;
             }[]
+        },
+        company: {
+            id?: string;
+            name?: string
         }
     };
     activeMenu: string;
@@ -48,6 +53,10 @@ const initialState: IState = {
             name: "",
             permissions: [],
         },
+        company: {
+            id: "",
+            name: ""
+        }
     },
 
     activeMenu: 'home'
@@ -70,6 +79,7 @@ export const accountSlide = createSlice({
             state.user.email = action.payload.email;
             state.user.name = action.payload.name;
             state.user.role = action?.payload?.role;
+            state.user.company = action?.payload?.company ?? { id: "", name: "" };
 
             if (!action?.payload?.user?.role) state.user.role = {};
             state.user.role.permissions = action?.payload?.role?.permissions ?? [];
@@ -86,6 +96,10 @@ export const accountSlide = createSlice({
                     name: "",
                     permissions: [],
                 },
+                company: {
+                    id: "",
+                    name: ""
+                }
             }
         },
         setRefreshTokenAction: (state, action) => {
@@ -111,6 +125,8 @@ export const accountSlide = createSlice({
                 state.user.email = action.payload.user?.email;
                 state.user.name = action.payload.user?.name;
                 state.user.role = action?.payload?.user?.role;
+                state.user.company = action?.payload?.user?.company ?? { id: "", name: "" };
+
                 if (!action?.payload?.user?.role) state.user.role = {};
                 state.user.role.permissions = action?.payload?.user?.role?.permissions ?? [];
             }

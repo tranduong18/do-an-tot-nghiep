@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ICompany, IJob, IReview } from "@/types/backend";
+import { IBlog, ICompany, IJob, IReview } from "@/types/backend";
 import {
     callFetchCompanyById,
     callFetchJobsByCompanyId,
@@ -8,6 +8,7 @@ import {
     callCreateCompanyReview,
     callUpdateCompanyReview,
     callDeleteCompanyReview,
+    callFetchBlogsByCompanyId,
 } from "@/config/api";
 import parse from "html-react-parser";
 import {
@@ -29,6 +30,7 @@ import {
     message,
     Empty,
     Popconfirm,
+    Spin,
 } from "antd";
 import { DeleteOutlined, DollarOutlined, EditOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import clientStyle from "@/styles/client.module.scss";
@@ -37,6 +39,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import PageHelmet from "@/components/share/page.helmet";
 import { useAppSelector } from "@/redux/hooks";
+import { convertSlug } from "@/config/utils";
 
 dayjs.extend(relativeTime);
 const { TextArea } = Input;
@@ -57,6 +60,12 @@ const ClientCompanyDetailPage = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
+
+    const [blogs, setBlogs] = useState<IBlog[]>([]);
+    const [blogLoading, setBlogLoading] = useState(false);
+    const [blogPage, setBlogPage] = useState(1);
+    const [blogPageSize, setBlogPageSize] = useState(6);
+    const [blogTotal, setBlogTotal] = useState(0);
 
     const currentUser = useAppSelector((state) => state.account.user);
 
@@ -113,6 +122,31 @@ const ClientCompanyDetailPage = () => {
 
     useEffect(() => {
         if (company?.id) loadReviews(1, pageSize);
+    }, [company?.id]);
+
+    const loadCompanyBlogs = async (p = blogPage, s = blogPageSize) => {
+        if (!company?.id) return;
+        setBlogLoading(true);
+        try {
+            const qs = new URLSearchParams({
+                page: String(p),
+                size: String(s),
+                sort: "updatedAt,desc",
+            });
+            const res = await callFetchBlogsByCompanyId(company.id, qs.toString());
+            if (res?.data) {
+                setBlogs(res.data.result || []);
+                setBlogTotal(res.data.meta?.total || 0);
+                setBlogPage(res.data.meta?.page || p);
+                setBlogPageSize(res.data.meta?.pageSize || s);
+            }
+        } finally {
+            setBlogLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (company?.id) loadCompanyBlogs(1, blogPageSize);
     }, [company?.id]);
 
     const openCreateModal = () => {
@@ -415,6 +449,72 @@ const ClientCompanyDetailPage = () => {
                                 )}
                             </Card>
                         </Tabs.TabPane>
+
+                        <Tabs.TabPane tab="Bài viết" key="5">
+                            <Spin spinning={blogLoading}>
+                                {blogs.length === 0 ? (
+                                    <Empty description="Chưa có bài viết" />
+                                ) : (
+                                    <>
+                                        <Row gutter={[16, 16]}>
+                                            {blogs.map((b) => (
+                                                <Col xs={24} md={12} lg={8} key={b.id}>
+                                                    <Card
+                                                        className={clientStyle["job-card-v2"]} // tái dùng style card có sẵn
+                                                        hoverable
+                                                        onClick={() =>
+                                                            navigate(`/blog/${convertSlug(b.title)}?id=${b.id}`)
+                                                        }
+                                                        cover={
+                                                            b.thumbnail ? (
+                                                                <img
+                                                                    src={b.thumbnail}
+                                                                    alt={b.title}
+                                                                    style={{ height: 160, objectFit: "cover" }}
+                                                                    loading="lazy"
+                                                                />
+                                                            ) : undefined
+                                                        }
+                                                    >
+                                                        <div className={clientStyle["job-card-header"]}>
+                                                            <span>
+                                                                Đăng{" "}
+                                                                {b.updatedAt
+                                                                    ? dayjs(b.updatedAt).locale("vi").fromNow()
+                                                                    : dayjs(b.createdAt).locale("vi").fromNow()}
+                                                            </span>
+                                                            <span className={clientStyle["new-badge"]}>BLOG</span>
+                                                        </div>
+                                                        <h3
+                                                            className={clientStyle["job-title"]}
+                                                            style={{ marginBottom: 6 }}
+                                                        >
+                                                            {b.title}
+                                                        </h3>
+
+                                                    </Card>
+                                                </Col>
+                                            ))}
+                                        </Row>
+
+                                        <div style={{ marginTop: 16, textAlign: "right" }}>
+                                            <Pagination
+                                                current={blogPage}
+                                                pageSize={blogPageSize}
+                                                total={blogTotal}
+                                                showSizeChanger
+                                                onChange={(p, s) => {
+                                                    setBlogPage(p);
+                                                    setBlogPageSize(s);
+                                                    loadCompanyBlogs(p, s);
+                                                }}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </Spin>
+                        </Tabs.TabPane>
+
                     </Tabs>
 
                     {/* Modal Viết/Sửa đánh giá */}

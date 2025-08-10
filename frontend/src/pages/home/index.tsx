@@ -4,6 +4,7 @@ import SearchClient from "@/components/client/search.client";
 import JobCard from "@/components/client/card/job.card";
 import CompanyCard from "@/components/client/card/company.card";
 import PageHelmet from "@/components/share/page.helmet";
+import BlogCard from "@/components/client/card/blog.card";
 
 const { Title } = Typography;
 
@@ -65,6 +66,9 @@ const HomePage = () => {
 
             {/* Job nổi bật */}
             <JobCard />
+
+            {/* Bài viết nổi bật */}
+            <BlogCard />
         </div>
     );
 };

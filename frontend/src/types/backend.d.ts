@@ -31,6 +31,10 @@ export interface IAccount {
                 method: string;
                 module: string;
             }[]
+        },
+        company: {
+            id: string;
+            name: string;
         }
     }
 }
@@ -237,4 +241,27 @@ export interface IReview {
     user: {
         id: string; fullName: string; avatar: string
     };
+}
+
+export interface IBlog {
+    id: number;
+    title: string;
+    slug: string;
+    description?: string;
+    content: string;
+    thumbnail: string;
+    published: boolean;
+
+    createdAt: string;
+    updatedAt?: string;
+    createdBy: string;
+    updatedBy?: string;
+
+    company?: {
+        id: number;
+        name: string;
+        logo?: string;
+        address?: string;
+        country?: string;
+    } | null;
 }

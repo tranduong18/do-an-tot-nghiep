@@ -44,7 +44,8 @@ const Header = (props: any) => {
             label: <Link to={'/company'}>Top Công ty IT</Link>,
             key: '/company',
             icon: <RiseOutlined />,
-        }
+        },
+
     ];
 
 

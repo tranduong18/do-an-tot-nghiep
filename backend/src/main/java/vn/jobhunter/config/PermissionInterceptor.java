@@ -41,7 +41,6 @@ public class PermissionInterceptor implements HandlerInterceptor {
         }
 
         if ("/api/v1/files".equals(path) && "GET".equalsIgnoreCase(httpMethod)) {
-            System.out.println(">>> BYPASS DOWNLOAD");
             return true;
         }
 
