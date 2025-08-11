@@ -27,7 +27,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { convertSlug } from "@/config/utils";
+import { convertSlug, sanitizeRichHtml } from "@/config/utils";
 import ApplyModal from "@/components/client/modal/apply.modal";
 import PageHelmet from "@/components/share/page.helmet";
 import { useAppSelector } from "@/redux/hooks";
@@ -266,7 +266,7 @@ const ClientJobDetailPage = () => {
                                             className={`${jobStyles["description-content"]} ${showFullDesc ? jobStyles["expanded"] : jobStyles["collapsed"]
                                                 }`}
                                         >
-                                            {parse(jobDetail.description)}
+                                            {parse(sanitizeRichHtml(jobDetail.description))}
                                         </div>
 
                                         <div style={{ textAlign: "center", marginTop: 8 }}>

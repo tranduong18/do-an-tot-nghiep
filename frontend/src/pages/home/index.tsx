@@ -31,8 +31,6 @@ const HomePage = () => {
                 </div>
             </div>
 
-            <Divider />
-
             {/* Top Company */}
             <CompanyCard />
 

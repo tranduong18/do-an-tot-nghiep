@@ -94,3 +94,10 @@ export const groupByPermission = (data: any[]): { module: string; permissions: I
         return { module: key, permissions: value as IPermission[] };
     });
 };
+
+export const sanitizeRichHtml = (html: string) => {
+    return (html || "")
+        .replace(/<p>(?:\s|&nbsp;|\u200B|\uFEFF|<br\s*\/?>)*<\/p>/gi, "")
+        .replace(/<p>\s*(<img\b[^>]*>)\s*<\/p>/gi, "$1")
+        .trim();
+};

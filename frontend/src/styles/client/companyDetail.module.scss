@@ -71,26 +71,156 @@
 }
 
 .company-description {
+  /* Font & base rhythm */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+  --fz-base: 16px;
+  --lh-base: 1.75;
+  --c-text: #333;
+  --c-muted: #666;
+
+  font-size: var(--fz-base);
+  line-height: var(--lh-base);
+  color: var(--c-text);
+
+  /* Reset khoảng cách lộn xộn từ HTML nhúng */
+  * {
+    margin-top: 0;
+  }
+  p,
+  ul,
+  ol,
+  blockquote,
+  table {
+    margin-bottom: 12px;
+  }
+
+  /* Headings nhất quán */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #222;
+    margin: 14px 0 8px;
+  }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 18px; }
+  h4 { font-size: 16px; }
+  h5, h6 { font-size: 15px; font-weight: 600; }
+
+  /* Đoạn văn */
   p {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #333;
-    margin-bottom: 12px;
+    font-size: var(--fz-base);
+    color: var(--c-text);
   }
-
-  ul {
-    padding-left: 20px;
-    margin-bottom: 12px;
-
-    li {
-      margin-bottom: 6px;
-      line-height: 1.8;
-    }
-  }
-
-  strong {
+  strong, b {
     font-weight: 600;
     color: #222;
+  }
+  em, i {
+    color: var(--c-muted);
+  }
+
+  /* Danh sách – đồng nhất dấu đầu dòng và căn lề */
+  ul, ol {
+    padding-left: 20px; /* giữ chuẩn với ảnh chụp */
+  }
+  li {
+    margin-bottom: 6px;
+    line-height: var(--lh-base);
+    /* Nếu nội dung có emoji/dấu icon đầu dòng ⇒ vẫn căn thẳng hàng text */
+    display: list-item;
+  }
+  /* Nếu muốn dấu • có màu thương hiệu (không áp cho emoji) */
+  ul:not([style*="list-style:none"]) li::marker {
+    color: #1677ff;
+  }
+
+  /* Ảnh trong nội dung – tự co giãn, có bo góc và khoảng cách đồng nhất */
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 10px 0;
+  }
+
+  /* Liên kết */
+  a {
+    color: #1677ff;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* Blockquote */
+  blockquote {
+    padding: 8px 12px;
+    border-left: 3px solid #1677ff;
+    background: #f7f9ff;
+    color: #333;
+    border-radius: 6px;
+  }
+
+  /* Bảng (nếu có trong nội dung) */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  th, td {
+    border: 1px solid #eee;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  thead th {
+    background: #fafafa;
+    font-weight: 600;
+  }
+
+  /* Khoảng cách cuối cùng gọn gàng */
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Tăng tính đồng nhất khi nội dung nằm trong thẻ Card của AntD */
+.company-tabs :global(.ant-card .ant-card-body) .company-description {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.benefits-layout {
+  /* Các đoạn list, text vẫn giữ nguyên block; chỉ gom những <p> chỉ chứa 1 <img> */
+  p:has(> img:only-child) {
+    display: inline-block;        /* cho phép đứng cùng hàng */
+    margin: 0 12px 12px 0;        /* khoảng cách giữa các ảnh */
+    vertical-align: top;          /* thẳng hàng trên */
+  }
+
+  /* Style ảnh trong các đoạn đó */
+  p:has(> img:only-child) > img {
+    display: block;
+    width: 260px;                 /* tuỳ kích thước mong muốn */
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  /* Hết hàng thì tự xuống dòng */
+  /* Responsive: mobile xếp 1 cột */
+  @media (max-width: 768px) {
+    p:has(> img:only-child) {
+      display: block;
+      margin: 0 0 12px 0;
+    }
+    p:has(> img:only-child) > img {
+      width: 100%;
+      height: auto;
+    }
   }
 }
 

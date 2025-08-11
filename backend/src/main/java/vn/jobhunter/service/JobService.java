@@ -141,6 +141,7 @@ public class JobService {
         jobInDB.setFields(j.getFields());
         jobInDB.setAddress(j.getAddress());
         jobInDB.setWorkType(j.getWorkType());
+        jobInDB.setDescription(j.getDescription());
 
         // update job
         Job currentJob = this.jobRepository.save(jobInDB);

@@ -311,7 +311,7 @@ const ClientCompanyDetailPage = () => {
                             </Card>
 
                             <Card title="Giới thiệu công ty" className={styles["info-card"]}>
-                                <div className={styles["company-description"]}>
+                                <div className={`${styles["company-description"]} ${styles["benefits-layout"]}`}>
                                     {parse(company.description || "<p>Chưa cập nhật</p>")}
                                 </div>
                             </Card>
@@ -319,7 +319,7 @@ const ClientCompanyDetailPage = () => {
 
                         <Tabs.TabPane tab="Phúc lợi" key="2">
                             <Card>
-                                <div className={styles["company-description"]}>
+                                <div className={`${styles["company-description"]} ${styles["benefits-layout"]}`}>
                                     {parse(company.benefits || "<p>Chưa cập nhật phúc lợi</p>")}
                                 </div>
                             </Card>

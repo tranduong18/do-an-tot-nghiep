@@ -1,7 +1,6 @@
 package vn.jobhunter.service;
 
 import java.nio.charset.StandardCharsets;
-
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -11,7 +10,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -21,8 +19,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
 
-    public EmailService(MailSender mailSender, JavaMailSender javaMailSender,
-            SpringTemplateEngine templateEngine) {
+    public EmailService(MailSender mailSender, JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
         this.mailSender = mailSender;
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
@@ -37,7 +34,6 @@ public class EmailService {
     }
 
     public void sendEmailSync(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
-        // Prepare message using a Spring helper
         MimeMessage mimeMessage = this.javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
@@ -45,18 +41,16 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(content, isHtml);
             this.javaMailSender.send(mimeMessage);
-
         } catch (MailException | MessagingException e) {
             System.out.println("ERROR SEND EMAIL:" + e);
         }
     }
 
     @Async
-    public void sendEmailFromTempleSync(String to, String subject, String templateName, String username, Object value) {
+    public void sendEmailFromTemplateSync(String to, String subject, String templateName, String name, Object jobs) {
         Context context = new Context();
-        context.setVariable("username", username);
-        context.setVariable("jobs", value);
-
+        context.setVariable("name", name);
+        context.setVariable("jobs", jobs);
         String content = templateEngine.process(templateName, context);
         this.sendEmailSync(to, subject, content, false, true);
     }

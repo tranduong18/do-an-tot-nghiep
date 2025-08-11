@@ -20,7 +20,7 @@ import {
     ProFormText,
 } from "@ant-design/pro-components";
 import styles from "styles/admin.module.scss";
-import { LOCATION_LIST } from "@/config/utils";
+import { LOCATION_LIST, sanitizeRichHtml } from "@/config/utils";
 import { ICompanySelect } from "../user/modal.user";
 import { useState, useEffect } from "react";
 import {
@@ -65,7 +65,7 @@ const ViewUpsertJob = () => {
                 const res = await callFetchJobById(id);
                 if (res && res.data) {
                     setDataUpdate(res.data);
-                    setValue(res.data.description);
+                    setValue(sanitizeRichHtml(res.data.description));;
                     setCompanies([
                         {
                             label: res.data.company?.name as string,
@@ -133,6 +133,8 @@ const ViewUpsertJob = () => {
             arrSkills = values?.skills?.map((item: any) => ({ id: +item }));
         }
 
+        const cleanDesc = sanitizeRichHtml(value);
+
         const job = {
             name: values.name,
             skills: arrSkills,
@@ -149,7 +151,7 @@ const ViewUpsertJob = () => {
             specialization: values.specialization,
             fields: values.fields,
             workType: values.workType,
-            description: value,
+            description: cleanDesc,
             startDate: /[0-9]{2}[/][0-9]{2}[/][0-9]{4}$/.test(values.startDate)
                 ? dayjs(values.startDate, "DD/MM/YYYY").toDate()
                 : values.startDate,

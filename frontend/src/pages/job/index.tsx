@@ -13,7 +13,6 @@ const ClientJobPage = (props: any) => {
                     <Col span={24}>
                         <SearchClient />
                     </Col>
-                    <Divider />
 
                     <Col span={24}>
                         <JobCard

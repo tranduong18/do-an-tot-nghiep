@@ -9,10 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResEmailJob {
+    private Long id;
     private String name;
     private double salary;
     private CompanyEmail company;
     private List<SkillEmail> skills;
+
+    private String url;
 
     @Getter
     @Setter
