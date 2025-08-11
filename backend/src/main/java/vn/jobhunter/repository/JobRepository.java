@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.Skill;
 
@@ -36,4 +37,6 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
         group by j.company.id
     """)
     List<Object[]> countOpenJobsGroupByCompany();
+    void deleteByCompany(Company company);
+    List<Job> findByCompany(Company company);
 }

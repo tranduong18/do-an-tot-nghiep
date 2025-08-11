@@ -25,10 +25,7 @@ import vn.jobhunter.domain.response.job.ResCompanyJobDTO;
 import vn.jobhunter.domain.response.job.ResCreateJobDTO;
 import vn.jobhunter.domain.response.job.ResSimilarJobDTO;
 import vn.jobhunter.domain.response.job.ResUpdateJobDTO;
-import vn.jobhunter.repository.CompanyRepository;
-import vn.jobhunter.repository.JobRepository;
-import vn.jobhunter.repository.SkillRepository;
-import vn.jobhunter.repository.UserRepository;
+import vn.jobhunter.repository.*;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.error.IdInvalidException;
 
@@ -38,13 +35,17 @@ public class JobService {
     private final SkillRepository skillRepository;
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final FavoriteJobRepository favoriteJobRepository;
+    private final ResumeRepository resumeRepository;
 
     public JobService(JobRepository jobRepository, SkillRepository skillRepository,
-                      CompanyRepository companyRepository, UserRepository userRepository) {
+                      CompanyRepository companyRepository, UserRepository userRepository, FavoriteJobRepository favoriteJobRepository, ResumeRepository resumeRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
+        this.favoriteJobRepository = favoriteJobRepository;
+        this.resumeRepository = resumeRepository;
     }
 
     public Optional<Job> fetchJobById(long id) {
@@ -180,6 +181,8 @@ public class JobService {
                 existing.getCompany().getId() != currentUser.getCompany().getId()) {
             throw new AccessDeniedException("Bạn không có quyền xóa job này");
         }
+        favoriteJobRepository.deleteByJob(existing);
+        resumeRepository.deleteByJob(existing);
         this.jobRepository.deleteById(id);
     }
 

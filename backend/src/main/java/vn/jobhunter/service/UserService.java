@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Role;
 import vn.jobhunter.domain.User;
@@ -17,6 +18,9 @@ import vn.jobhunter.domain.response.ResCreateUserDTO;
 import vn.jobhunter.domain.response.ResUpdateUserDTO;
 import vn.jobhunter.domain.response.ResUserDTO;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
+import vn.jobhunter.repository.FavoriteJobRepository;
+import vn.jobhunter.repository.ResumeRepository;
+import vn.jobhunter.repository.ReviewRepository;
 import vn.jobhunter.repository.UserRepository;
 
 @Service
@@ -25,12 +29,19 @@ public class UserService {
     private final CompanyService companyService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final ResumeRepository resumeRepository;
+    private final ReviewRepository reviewRepository;
+    private final FavoriteJobRepository favoriteJobRepository;
 
-    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, CompanyService companyService, RoleService roleService, PasswordEncoder passwordEncoder, ResumeRepository resumeRepository,
+                       ReviewRepository reviewRepository, FavoriteJobRepository favoriteJobRepository) {
         this.userRepository = userRepository;
         this.companyService = companyService;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.resumeRepository = resumeRepository;
+        this.reviewRepository = reviewRepository;
+        this.favoriteJobRepository = favoriteJobRepository;
     }
 
     public User handleCreateUser(User user) {
@@ -49,8 +60,15 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
+    @Transactional
     public void handleDeleteUser(long id) {
-        this.userRepository.deleteById(id);
+        User user = this.fetchUserById(id);
+        if (user != null) {
+            reviewRepository.deleteByUser(user);
+            resumeRepository.deleteByUser(user);
+            favoriteJobRepository.deleteByUser(user);
+            userRepository.delete(user);
+        }
     }
 
     public User fetchUserById(long id) {
@@ -73,8 +91,6 @@ public class UserService {
         mt.setTotal(pageUser.getTotalElements());
 
         rs.setMeta(mt);
-
-        // remove sensitive data
 
         List<ResUserDTO> listUser = pageUser.getContent().stream().map(item -> this.convertToResUserDTO(item))
                 .collect(Collectors.toList());

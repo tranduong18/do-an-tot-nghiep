@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Review;
+import vn.jobhunter.domain.User;
+
+import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByCompany(Company company, Pageable pageable);
@@ -19,4 +22,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         WHERE r.company = :company
     """)
     double avgRating(Company company);
+
+    void deleteByUser(User user);
+
+    void deleteByCompany(Company company);
+    void deleteByUserIn(List<User> users);
 }

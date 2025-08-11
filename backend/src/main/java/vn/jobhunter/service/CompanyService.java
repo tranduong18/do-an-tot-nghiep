@@ -11,12 +11,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import vn.jobhunter.domain.Company;
+import vn.jobhunter.domain.Job;
 import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
-import vn.jobhunter.repository.CompanyRepository;
-import vn.jobhunter.repository.JobRepository;
-import vn.jobhunter.repository.UserRepository;
+import vn.jobhunter.repository.*;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.error.IdInvalidException;
 
@@ -25,11 +25,18 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
+    private final ReviewRepository reviewRepository;
+    private final ResumeRepository resumeRepository;
+    private final FavoriteJobRepository favoriteJobRepository;
 
-    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository, JobRepository jobRepository) {
+    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository, JobRepository jobRepository,
+                          ReviewRepository reviewRepository, ResumeRepository resumeRepository, FavoriteJobRepository favoriteJobRepository) {
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.reviewRepository = reviewRepository;
+        this.resumeRepository = resumeRepository;
+        this.favoriteJobRepository = favoriteJobRepository;
     }
 
     // Tạo công ty
@@ -116,6 +123,7 @@ public class CompanyService {
     }
 
     // Xóa công ty
+    @Transactional
     public void handleDeleteCompany(long id) throws IdInvalidException {
         User currentUser = userRepository.findByEmail(SecurityUtil.getCurrentUserLogin().orElseThrow());
         Optional<Company> comOptional = this.companyRepository.findById(id);
@@ -131,10 +139,36 @@ public class CompanyService {
             throw new AccessDeniedException("Bạn không có quyền xóa công ty này");
         }
 
-        // Xóa toàn bộ user thuộc công ty này
+        // Xóa toàn bộ user, job thuộc công ty này
         List<User> users = this.userRepository.findByCompany(com);
-        this.userRepository.deleteAll(users);
+        List<Job> jobs  = this.jobRepository.findByCompany(com);
 
+        if (!users.isEmpty()) {
+            favoriteJobRepository.deleteByUserIn(users);
+            reviewRepository.deleteByUserIn(users);
+            // (tùy chọn) nếu muốn xoá resume của các user này (nếu có FK user_id)
+            resumeRepository.deleteByUserIn(users);
+        }
+
+        // 2.2 Resume ứng tuyển vào các Job của công ty
+        if (!jobs.isEmpty()) {
+            favoriteJobRepository.deleteByJobIn(jobs);
+            resumeRepository.deleteByJobIn(jobs);
+        }
+
+        // 2.3 Review gắn trực tiếp với công ty (nếu bảng review có cột company_id)
+        reviewRepository.deleteByCompany(com);
+
+        // 3) Xóa jobs của công ty
+        if (!jobs.isEmpty()) {
+            jobRepository.deleteAll(jobs);
+            // hoặc: jobRepository.deleteByCompany(com);
+        }
+
+        // 4) Xóa users thuộc công ty
+        if (!users.isEmpty()) {
+            userRepository.deleteAll(users);
+        }
         this.companyRepository.deleteById(id);
     }
 

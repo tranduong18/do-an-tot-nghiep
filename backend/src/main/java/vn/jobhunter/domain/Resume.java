@@ -16,6 +16,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.constant.ResumeStateEnum;
 

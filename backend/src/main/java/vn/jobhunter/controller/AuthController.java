@@ -14,11 +14,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import vn.jobhunter.domain.Role;
 import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.request.ReqLoginDTO;
 import vn.jobhunter.domain.response.ResCreateUserDTO;
 import vn.jobhunter.domain.response.ResLoginDTO;
 import vn.jobhunter.domain.request.ReqChangePassDTO;
+import vn.jobhunter.service.RoleService;
 import vn.jobhunter.service.UserService;
 import vn.jobhunter.util.SecurityUtil;
 import vn.jobhunter.util.annotation.ApiMessage;
@@ -32,16 +34,18 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-            UserService userService, PasswordEncoder passwordEncoder) {
+            UserService userService, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @PostMapping("/auth/login")
@@ -184,6 +188,12 @@ public class AuthController {
         if (isEmailExist) {
             throw new IdInvalidException("Email " + pUser.getEmail() + " đã tồn tại.");
         }
+
+        Role candidateRole = roleService.fetchByName("Candidate");
+        if (candidateRole == null) {
+            throw new IdInvalidException("Role candidate không tồn tại trong hệ thống.");
+        }
+        pUser.setRole(candidateRole);
 
         String hashPassword = this.passwordEncoder.encode(pUser.getPassword());
         pUser.setPassword(hashPassword);

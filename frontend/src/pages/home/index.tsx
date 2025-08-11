@@ -8,15 +8,6 @@ import BlogCard from "@/components/client/card/blog.card";
 
 const { Title } = Typography;
 
-const categories = [
-    { name: "Frontend Developer", icon: "💻" },
-    { name: "Backend Developer", icon: "🖥️" },
-    { name: "Mobile Developer", icon: "📱" },
-    { name: "QA/QC", icon: "🧪" },
-    { name: "DevOps", icon: "⚙️" },
-    { name: "Data Engineer", icon: "📊" },
-];
-
 const HomePage = () => {
     return (
         <div className={styles["container"]}>
@@ -38,23 +29,6 @@ const HomePage = () => {
                         <SearchClient />
                     </div>
                 </div>
-            </div>
-
-            {/* Categories */}
-            <div className={styles["category-section"]}>
-                <Title level={2} style={{ textAlign: "center" }}>
-                    Khám phá việc làm theo ngành
-                </Title>
-                <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
-                    {categories.map((cat) => (
-                        <Col xs={12} sm={8} md={6} key={cat.name}>
-                            <Card hoverable style={{ textAlign: "center", padding: 10 }}>
-                                <div style={{ fontSize: 32 }}>{cat.icon}</div>
-                                <div style={{ marginTop: 10, fontWeight: 500 }}>{cat.name}</div>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
             </div>
 
             <Divider />
