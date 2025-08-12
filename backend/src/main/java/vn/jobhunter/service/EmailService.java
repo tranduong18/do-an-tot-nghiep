@@ -1,6 +1,8 @@
 package vn.jobhunter.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -53,5 +55,21 @@ public class EmailService {
         context.setVariable("jobs", jobs);
         String content = templateEngine.process(templateName, context);
         this.sendEmailSync(to, subject, content, false, true);
+    }
+
+    @Async
+    public void sendResumeStatusTemplate(String to, String subject, Map<String, Object> model) {
+        try {
+            Context ctx = new Context();
+            if (model != null) {
+                for (Map.Entry<String, Object> e : model.entrySet()) {
+                    ctx.setVariable(e.getKey(), e.getValue());
+                }
+            }
+            String content = templateEngine.process("resume-status", ctx);
+            this.sendEmailSync(to, subject, content, false, true);
+        } catch (Exception e) {
+            System.out.println("ERROR SEND EMAIL TEMPLATE:" + e);
+        }
     }
 }

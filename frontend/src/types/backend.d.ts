@@ -90,6 +90,7 @@ export interface IUser {
     gender: string;
     address: string;
     avatar: string;
+    cvUrl: string;
     role?: {
         id: string;
         name: string;
@@ -186,6 +187,11 @@ export interface IResume {
     deletedAt?: boolean | null;
     createdAt?: string;
     updatedAt?: string;
+
+    interviewAt?: string | null;
+    interviewLocation?: string | null;
+    interviewNote?: string | null;
+    rejectReason?: string | null;
 }
 
 export interface IPermission {
@@ -288,4 +294,18 @@ export interface IMessageDTO {
 export interface IResetTokenDTO {
     resetToken: string;
     expiresInMinutes: number;
+}
+
+// Notification
+export interface INotification {
+    id: number;
+    title: string;
+    content: string;
+    type: string;
+    read: boolean;
+    createdAt: string;
+}
+
+export interface IUnreadCount {
+    count: number;
 }

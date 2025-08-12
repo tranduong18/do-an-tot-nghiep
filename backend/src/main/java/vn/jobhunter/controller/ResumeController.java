@@ -12,6 +12,7 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.jobhunter.domain.Resume;
+import vn.jobhunter.domain.request.ReqUpdateResumeStatus;
 import vn.jobhunter.domain.response.ResultPaginationDTO;
 import vn.jobhunter.domain.response.resume.ResCreateResumeDTO;
 import vn.jobhunter.domain.response.resume.ResFetchResumeDTO;
@@ -53,6 +54,13 @@ public class ResumeController {
             throw new IdInvalidException("Resume với id = " + resume.getId() + " không tồn tại.");
         }
         return ResponseEntity.ok().body(this.resumeService.update(resume));
+    }
+
+    @PutMapping("/resumes/status")
+    @ApiMessage("Update resume status")
+    public ResponseEntity<ResUpdateResumeDTO> updateStatus(@RequestBody ReqUpdateResumeStatus req)
+            throws IdInvalidException {
+        return ResponseEntity.ok().body(this.resumeService.updateStatus(req));
     }
 
     @DeleteMapping("/resumes/{id}")

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Cập nhật hồ sơ</title>
+</head>
+<body style="font-family: Arial, sans-serif; color:#222; line-height:1.6; background-color:#f9f9f9;">
+<div style="max-width:640px;margin:auto;padding:16px;border:1px solid #eee;border-radius:8px;background-color:#fff;">
+
+    <!-- Tiêu đề -->
+    <h2 style="margin-top:0; text-align:center; color:#333;">
+        <span th:if="${status} == 'APPROVED'">🎉 Thông báo trúng tuyển</span>
+        <span th:if="${status} == 'REJECTED'">📄 Thông báo kết quả hồ sơ</span>
+    </h2>
+
+    <p>Xin chào <b th:text="${name}">Ứng viên</b>,</p>
+
+    <!-- Nội dung khi APPROVED -->
+    <div th:if="${status} == 'APPROVED'">
+        <p>Chúc mừng bạn! Sau quá trình xét duyệt hồ sơ và phỏng vấn, chúng tôi rất vui mừng thông báo rằng bạn đã được <b>chấp nhận</b> cho vị trí:</p>
+        <p><b>Vị trí:</b> <span th:text="${jobName}">Java Developer</span></p>
+        <p><b>Công ty:</b> <span th:text="${companyName}">ABC Corp</span></p>
+        <p th:if="${interviewAt}"><b>Thời gian phỏng vấn:</b> <span th:text="${interviewAt}"></span></p>
+        <p th:if="${interviewLocation}"><b>Địa điểm/Link:</b> <span th:text="${interviewLocation}"></span></p>
+        <p th:if="${interviewNote}"><b>Ghi chú:</b> <span th:text="${interviewNote}"></span></p>
+        <p>Vui lòng chuẩn bị kỹ lưỡng và có mặt đúng giờ. Chúng tôi rất mong được gặp bạn!</p>
+    </div>
+
+    <!-- Nội dung khi REJECTED -->
+    <div th:if="${status} == 'REJECTED'">
+        <p>Cảm ơn bạn đã quan tâm và ứng tuyển cho vị trí:</p>
+        <p><b>Vị trí:</b> <span th:text="${jobName}">Java Developer</span></p>
+        <p><b>Công ty:</b> <span th:text="${companyName}">ABC Corp</span></p>
+        <p>Rất tiếc, hồ sơ của bạn <b>không được lựa chọn</b> trong đợt tuyển dụng này.</p>
+        <p th:if="${rejectReason}"><b>Lý do:</b> <span th:text="${rejectReason}"></span></p>
+        <p>Chúng tôi hy vọng sẽ được hợp tác cùng bạn trong những cơ hội sau.</p>
+    </div>
+
+    <hr/>
+    <p>Trân trọng,</p>
+    <p><b>JobHunter Team</b></p>
+</div>
+</body>
+</html>

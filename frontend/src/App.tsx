@@ -35,6 +35,8 @@ import ClientBlogPage from './pages/blog';
 import ClientBlogDetailPage from './pages/blog/detail';
 import ForgotPasswordPage from './pages/auth/forgot-password';
 
+import { useResumeSSE } from '@/config/realtime/useResumeSSE';
+
 const LayoutClient = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
@@ -61,7 +63,7 @@ const LayoutClient = () => {
 export default function App() {
   const dispatch = useAppDispatch();
   const isLoading = useAppSelector(state => state.account.isLoading);
-
+  const account = useAppSelector(state => state.account.user);
 
   useEffect(() => {
     if (
@@ -71,6 +73,17 @@ export default function App() {
       return;
     dispatch(fetchAccount())
   }, [])
+
+  // ✅ Kết nối SSE khi đã đăng nhập
+  const apiBaseUrl = import.meta.env.VITE_BACKEND_URL as string;
+  useResumeSSE({
+    apiBaseUrl,
+    userId: account?.id,
+    onEvent: () => {
+      // TODO: nếu bạn có badge thông báo: gọi refetch unread-count ở đây
+      // dispatch(fetchUnreadCount());
+    },
+  });
 
   const router = createBrowserRouter([
     {

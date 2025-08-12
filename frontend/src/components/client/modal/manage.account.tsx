@@ -36,6 +36,19 @@ const UserResume = (props: any) => {
         init();
     }, [])
 
+    const STATUS_VN: Record<string, string> = {
+        PENDING: "Chờ duyệt",
+        REVIEWING: "Đang xem xét",
+        APPROVED: "Đã phê duyệt",
+        REJECTED: "Từ chối",
+    };
+    const STATUS_COLOR: Record<string, string> = {
+        PENDING: "gold",
+        REVIEWING: "blue",
+        APPROVED: "green",
+        REJECTED: "red",
+    };
+
     const columns: ColumnsType<IResume> = [
         {
             title: 'STT',
@@ -60,14 +73,13 @@ const UserResume = (props: any) => {
 
         },
         {
-            title: 'Trạng thái',
+            title: "Trạng thái",
             dataIndex: "status",
-            render: (v) => {
-                const color =
-                    v === 'APPROVED' ? 'green' :
-                        v === 'REJECTED' ? 'red' : 'gold';
-                return <span style={{ color, fontWeight: 600 }}>{v}</span>;
-            }
+            render: (v: IResume["status"]) => (
+                <Tag color={STATUS_COLOR[v] || "default"} style={{ fontWeight: 600 }}>
+                    {STATUS_VN[v] || v}
+                </Tag>
+            ),
         },
         {
             title: 'Ngày rải CV',
@@ -79,7 +91,7 @@ const UserResume = (props: any) => {
             },
         },
         {
-            title: '',
+            title: 'Hồ sơ',
             dataIndex: "",
             render(value, record, index) {
                 return (
@@ -137,7 +149,6 @@ const UserFavoriteJobs = () => {
         try {
             await callFavoriteDelete(jobId);
             message.success("Đã bỏ khỏi yêu thích");
-            // nếu trang hiện tại hết dữ liệu sau khi xóa, lùi 1 trang
             const remain = data.length - 1;
             const nextPage = remain === 0 && page > 1 ? page - 1 : page;
             setPage(nextPage);
@@ -160,7 +171,6 @@ const UserFavoriteJobs = () => {
             dataIndex: "companyName",
             render: (_: any, record) => (
                 <Space>
-
                     <span style={{ fontWeight: 600 }}>{record.companyName}</span>
                 </Space>
             ),

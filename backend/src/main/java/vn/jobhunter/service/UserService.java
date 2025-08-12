@@ -106,6 +106,7 @@ public class UserService {
             currentUser.setGender(reqUser.getGender());
             currentUser.setAge(reqUser.getAge());
             currentUser.setAvatar(reqUser.getAvatar());
+            currentUser.setCvUrl(reqUser.getCvUrl());
 
             // check company
             if (reqUser.getCompany() != null) {
@@ -146,6 +147,7 @@ public class UserService {
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
         res.setAvatar(user.getAvatar());
+        res.setCvUrl(user.getCvUrl());
 
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
@@ -165,6 +167,7 @@ public class UserService {
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
         res.setAvatar(user.getAvatar());
+        res.setCvUrl(user.getCvUrl());
 
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
@@ -200,6 +203,7 @@ public class UserService {
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
         res.setAvatar(user.getAvatar());
+        res.setCvUrl(user.getCvUrl());
         return res;
     }
 

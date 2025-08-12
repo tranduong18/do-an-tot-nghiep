@@ -1,4 +1,4 @@
-import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview, IBlog, IMessageDTO, IResetTokenDTO } from '@/types/backend';
+import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJob, IResume, IPermission, IRole, ISkill, ISubscribers, IFavoriteItem, IReview, IBlog, IMessageDTO, IResetTokenDTO, IUnreadCount, INotification } from '@/types/backend';
 import axios from 'config/axios-customize';
 
 // View Dashboard
@@ -218,6 +218,17 @@ export const callFetchResumeByUser = () => {
     return axios.post<IBackendRes<IModelPaginate<IResume>>>(`/api/v1/resumes/by-user`);
 }
 
+export const callUpdateResumeStatusV2 = (payload: {
+    id: number | string;
+    status: 'PENDING' | 'REVIEWING' | 'APPROVED' | 'REJECTED';
+    interviewAt?: string;
+    interviewLocation?: string;
+    interviewNote?: string;
+    rejectReason?: string;
+}) => {
+    return axios.put<IBackendRes<any>>('/api/v1/resumes/status', payload);
+};
+
 /**
  * 
 Module Permission
@@ -413,4 +424,31 @@ export const callPasswordOtpVerify = (email: string, otp: string) => {
 
 export const callPasswordReset = (resetToken: string, newPassword: string) => {
     return axios.post<IBackendRes<IMessageDTO>>(`/api/v1/auth/password/reset`, { resetToken, newPassword });
+};
+
+// Notification
+export const callUnreadCount = () => {
+    return axios.get<IBackendRes<IUnreadCount>>('/api/v1/notifications/unread-count');
+};
+
+export const callNotifications = (page = 1, size = 10) => {
+    return axios.get<IBackendRes<IModelPaginate<INotification>>>('/api/v1/notifications', {
+        params: { page, size },
+    });
+};
+
+export const callMarkRead = (id: number) => {
+    return axios.post<IBackendRes<string>>(`/api/v1/notifications/${id}/read`);
+};
+
+export const callReadAll = () => {
+    return axios.post<IBackendRes<string>>('/api/v1/notifications/read-all');
+};
+
+export const callDeleteNotification = (id: number) => {
+    return axios.delete<IBackendRes<string>>(`/api/v1/notifications/${id}`);
+};
+
+export const callDeleteAllNotifications = () => {
+    return axios.delete<IBackendRes<string>>('/api/v1/notifications');
 };

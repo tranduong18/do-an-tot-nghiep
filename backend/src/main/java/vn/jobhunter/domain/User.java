@@ -46,6 +46,9 @@ public class User {
     private GenderEnum gender;
 
     private String address;
+
+    private String cvUrl;
+
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
     private Instant createdAt;

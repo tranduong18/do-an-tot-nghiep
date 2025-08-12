@@ -21,6 +21,7 @@ interface IUserState {
         gender: string;
         address: string;
         avatar: string;
+        cvUrl: string;
     };
 }
 
@@ -35,6 +36,7 @@ const initialState: IUserState = {
         gender: "",
         address: "",
         avatar: "",
+        cvUrl: ""
     },
 };
 
@@ -66,6 +68,7 @@ export const userSlice = createSlice({
                 state.user.gender = action?.payload.gender;
                 state.user.address = action?.payload.address;
                 state.user.avatar = action?.payload.avatar;
+                state.user.cvUrl = action?.payload.cvUrl;
             }
         });
 

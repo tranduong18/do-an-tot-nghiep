@@ -2,7 +2,7 @@ import DataTable from "@/components/client/data-table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { IResume } from "@/types/backend";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import { Space, message, notification } from "antd";
+import { Popconfirm, Space, message, notification } from "antd";
 import { useState, useRef } from 'react';
 import dayjs from 'dayjs';
 import { callDeleteResume } from "@/config/api";
@@ -12,8 +12,15 @@ import ViewDetailResume from "@/components/admin/resume/view.resume";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
-import { EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import PageHelmet from "@/components/share/page.helmet";
+
+const STATUS_VN: Record<string, string> = {
+    PENDING: "Chờ duyệt",
+    REVIEWING: "Đang xem xét",
+    APPROVED: "Đã phê duyệt",
+    REJECTED: "Từ chối",
+};
 
 const ResumePage = () => {
     const tableRef = useRef<ActionType>();
@@ -66,35 +73,51 @@ const ResumePage = () => {
             title: 'Trạng Thái',
             dataIndex: 'status',
             sorter: true,
-            renderFormItem: (item, props, form) => (
+            render: (_, record) => STATUS_VN[record.status as string] || record.status,
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
                     mode="multiple"
                     allowClear
-                    valueEnum={{
-                        PENDING: 'PENDING',
-                        REVIEWING: 'REVIEWING',
-                        APPROVED: 'APPROVED',
-                        REJECTED: 'REJECTED',
-                    }}
-                    placeholder="Chọn level"
+                    options={[
+                        { label: STATUS_VN.PENDING, value: "PENDING" },
+                        { label: STATUS_VN.REVIEWING, value: "REVIEWING" },
+                        { label: STATUS_VN.APPROVED, value: "APPROVED" },
+                        { label: STATUS_VN.REJECTED, value: "REJECTED" },
+                    ]}
+                    placeholder="Chọn trạng thái"
                 />
             ),
         },
 
         {
-            title: 'Job',
+            title: 'Việc làm',
             dataIndex: ["job", "name"],
             hideInSearch: true,
         },
         {
-            title: 'Company',
+            title: 'Công ty',
             dataIndex: "companyName",
             hideInSearch: true,
         },
-
         {
-            title: 'CreatedAt',
+            title: "Hồ sơ",
+            dataIndex: "url",
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                const href = (record as any)?.url || (text as string);
+                return href ? (
+                    <a href={href} target="_blank" rel="noopener noreferrer">
+                        Xem chi tiết
+                    </a>
+                ) : (
+                    "—"
+                );
+            },
+        },
+        {
+            title: 'Ngày tạo',
             dataIndex: 'createdAt',
             width: 200,
             sorter: true,
@@ -106,7 +129,7 @@ const ResumePage = () => {
             hideInSearch: true,
         },
         {
-            title: 'UpdatedAt',
+            title: 'Ngày cập nhật',
             dataIndex: 'updatedAt',
             width: 200,
             sorter: true,
@@ -119,7 +142,7 @@ const ResumePage = () => {
         },
         {
 
-            title: 'Actions',
+            title: 'Hành động',
             hideInSearch: true,
             width: 100,
             render: (_value, entity, _index, _action) => (
@@ -136,7 +159,7 @@ const ResumePage = () => {
                         }}
                     />
 
-                    {/* <Popconfirm
+                    <Popconfirm
                         placement="leftTop"
                         title={"Xác nhận xóa resume"}
                         description={"Bạn có chắc chắn muốn xóa resume này ?"}
@@ -152,7 +175,7 @@ const ResumePage = () => {
                                 }}
                             />
                         </span>
-                    </Popconfirm> */}
+                    </Popconfirm>
                 </Space>
             ),
 

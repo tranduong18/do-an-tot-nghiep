@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { callLogout } from '@/config/api';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import ManageAccount from './modal/manage.account';
+import NotificationBell from "@/components/client/NotificationBell";
 
 const Header = (props: any) => {
     const navigate = useNavigate();
@@ -91,7 +92,20 @@ const Header = (props: any) => {
         },
     ];
 
-    const itemsMobiles = [...items, ...itemsDropdown];
+    const itemsMobiles: MenuProps['items'] = [
+        ...items,
+        { type: 'divider' as const },
+        // ✅ Mục “Thông báo” trong drawer mobile: click mở ManageAccount? Không — mở Drawer của Bell là đủ.
+        {
+            key: 'notifications',
+            label: <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {/* Render bell inline cho mobile (bấm để mở Drawer của bell) */}
+                <NotificationBell />
+                <span>Thông báo</span>
+            </div>,
+        },
+        ...itemsDropdown,
+    ];
 
     return (
         <>
@@ -126,16 +140,19 @@ const Header = (props: any) => {
                                         items={items}
                                     />
                                 </ConfigProvider>
-                                <div className={styles['extra']}>
+                                <div className={styles['extra']} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     {isAuthenticated === false ?
                                         <Link to={'/login'}>Đăng Nhập</Link>
                                         :
-                                        <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
-                                            <Space style={{ cursor: "pointer" }}>
-                                                <span>Welcome {user?.name}</span>
-                                                <Avatar> {user?.name?.substring(0, 2)?.toUpperCase()} </Avatar>
-                                            </Space>
-                                        </Dropdown>
+                                        <>
+                                            <NotificationBell />
+                                            <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
+                                                <Space style={{ cursor: "pointer" }}>
+                                                    <span>Welcome {user?.name}</span>
+                                                    <Avatar> {user?.name?.substring(0, 2)?.toUpperCase()} </Avatar>
+                                                </Space>
+                                            </Dropdown>
+                                        </>
                                     }
 
                                 </div>
