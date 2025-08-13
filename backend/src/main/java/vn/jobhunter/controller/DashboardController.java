@@ -1,18 +1,11 @@
 package vn.jobhunter.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import vn.jobhunter.domain.response.dashboard.ResTopCompanyDTO;
-import vn.jobhunter.domain.response.dashboard.ResUserMonthlyDTO;
-import vn.jobhunter.repository.*;
+import vn.jobhunter.domain.response.dashboard.DashboardSummaryDTO;
 import vn.jobhunter.service.DashboardService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/v1/dashboard")
+@RequestMapping("/api/v1/")
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -21,18 +14,12 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping("/stats")
-    public Map<String, Long> getStats() {
-        return dashboardService.getSystemStats();
-    }
-
-    @GetMapping("/user-monthly")
-    public List<ResUserMonthlyDTO> getUserMonthly() {
-        return dashboardService.getUserMonthlyStats();
-    }
-
-    @GetMapping("/top-companies")
-    public List<ResTopCompanyDTO> getTopCompanies() {
-        return dashboardService.getTopCompanies();
+    @GetMapping("/dashboard/summary")
+    public DashboardSummaryDTO summary(
+            @RequestParam(defaultValue = "12") int months,
+            @RequestParam(defaultValue = "10") int top,
+            @RequestParam(defaultValue = "30") int daysForPeak
+    ) {
+        return dashboardService.getSummary(months, top, daysForPeak);
     }
 }

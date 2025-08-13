@@ -1,5 +1,6 @@
 package vn.jobhunter.repository;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,39 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
         group by j.company.id
     """)
     List<Object[]> countOpenJobsGroupByCompany();
-    void deleteByCompany(Company company);
+
     List<Job> findByCompany(Company company);
+
+    @Query("SELECT COUNT(j) FROM Job j WHERE j.createdAt BETWEEN :start AND :end")
+    long countCreatedBetween(@Param("start") Instant start, @Param("end") Instant end);
+
+    // Đếm job đang mở (active + chưa hết hạn)
+    @Query("""
+    SELECT COUNT(j) FROM Job j
+    WHERE j.active = true AND (j.endDate IS NULL OR j.endDate >= :now)
+""")
+    long countActive(@Param("now") Instant now);
+
+    // Top công ty theo số job tạo trong tháng hiện tại
+    @Query("""
+    SELECT j.company.name, COUNT(j)
+    FROM Job j
+    WHERE j.createdAt BETWEEN :start AND :end
+    GROUP BY j.company.name
+    ORDER BY COUNT(j) DESC
+""")
+    List<Object[]> topCompaniesThisMonth(@Param("start") Instant start, @Param("end") Instant end);
+
+    // Phân bổ chuyên môn job (đang mở) cho donut
+    @Query("""
+    SELECT j.specialization, COUNT(j)
+    FROM Job j
+    WHERE j.active = true AND (j.endDate IS NULL OR j.endDate >= :now)
+    GROUP BY j.specialization
+    ORDER BY COUNT(j) DESC
+""")
+    List<Object[]> specializationCountsActive(@Param("now") Instant now);
+
+
+
 }

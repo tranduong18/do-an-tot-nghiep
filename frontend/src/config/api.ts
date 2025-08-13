@@ -2,17 +2,8 @@ import { IBackendRes, ICompany, IAccount, IUser, IModelPaginate, IGetAccount, IJ
 import axios from 'config/axios-customize';
 
 // View Dashboard
-export const fetchDashboardStats = () => {
-    return axios.get('/api/v1/dashboard/stats');
-};
-
-export const fetchTopCompanies = () => {
-    return axios.get('/api/v1/dashboard/top-companies');
-};
-
-export const fetchUserMonthly = () => {
-    return axios.get('/api/v1/dashboard/user-monthly');
-};
+export const fetchDashboardSummary = (params?: { months?: number; top?: number; daysForPeak?: number }) =>
+    axios.get('/api/v1/dashboard/summary', { params });
 
 /**
  * 
