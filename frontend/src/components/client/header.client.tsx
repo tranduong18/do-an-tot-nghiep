@@ -19,6 +19,7 @@ const Header = (props: any) => {
 
     const isAuthenticated = useAppSelector(state => state.account.isAuthenticated);
     const user = useAppSelector(state => state.account.user);
+    console.log(user);
     const [openMobileMenu, setOpenMobileMenu] = useState<boolean>(false);
 
     const [current, setCurrent] = useState('home');
@@ -149,7 +150,11 @@ const Header = (props: any) => {
                                             <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
                                                 <Space style={{ cursor: "pointer" }}>
                                                     <span>Welcome {user?.name}</span>
-                                                    <Avatar> {user?.name?.substring(0, 2)?.toUpperCase()} </Avatar>
+                                                    {user?.avatar ? (
+                                                        <Avatar src={user.avatar} />
+                                                    ) : (
+                                                        <Avatar>{user?.name?.substring(0, 2)?.toUpperCase()}</Avatar>
+                                                    )}
                                                 </Space>
                                             </Dropdown>
                                         </>
