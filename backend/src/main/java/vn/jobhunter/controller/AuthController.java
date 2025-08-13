@@ -14,12 +14,14 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import vn.jobhunter.domain.Company;
 import vn.jobhunter.domain.Role;
 import vn.jobhunter.domain.User;
 import vn.jobhunter.domain.request.ReqLoginDTO;
 import vn.jobhunter.domain.response.ResCreateUserDTO;
 import vn.jobhunter.domain.response.ResLoginDTO;
 import vn.jobhunter.domain.request.ReqChangePassDTO;
+import vn.jobhunter.service.CompanyService;
 import vn.jobhunter.service.RoleService;
 import vn.jobhunter.service.UserService;
 import vn.jobhunter.util.SecurityUtil;
@@ -35,17 +37,19 @@ public class AuthController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final CompanyService companyService;
 
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-            UserService userService, PasswordEncoder passwordEncoder, RoleService roleService) {
+            UserService userService, PasswordEncoder passwordEncoder, RoleService roleService, CompanyService companyService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.roleService = roleService;
+        this.companyService = companyService;
     }
 
     @PostMapping("/auth/login")
@@ -184,21 +188,39 @@ public class AuthController {
     @PostMapping("/auth/register")
     @ApiMessage("Register a new user")
     public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody User pUser) throws IdInvalidException {
-        boolean isEmailExist = this.userService.isEmailExist(pUser.getEmail());
-        if (isEmailExist) {
+        if (userService.isEmailExist(pUser.getEmail())) {
             throw new IdInvalidException("Email " + pUser.getEmail() + " đã tồn tại.");
         }
 
-        Role candidateRole = roleService.fetchByName("Candidate");
-        if (candidateRole == null) {
-            throw new IdInvalidException("Role candidate không tồn tại trong hệ thống.");
-        }
-        pUser.setRole(candidateRole);
+        String requestedRoleName = (pUser.getRole() != null && pUser.getRole().getName() != null)
+                ? pUser.getRole().getName().trim()
+                : "Candidate";
 
-        String hashPassword = this.passwordEncoder.encode(pUser.getPassword());
-        pUser.setPassword(hashPassword);
-        User user = this.userService.handleCreateUser(pUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(user));
+        String finalRoleName = requestedRoleName.equalsIgnoreCase("HR") ? "HR" : "Candidate";
+        Role finalRole = roleService.fetchByName(finalRoleName);
+        if (finalRole == null) {
+            throw new IdInvalidException("Role " + finalRoleName + " không tồn tại trong hệ thống.");
+        }
+
+        User user = new User();
+        user.setEmail(pUser.getEmail());
+        user.setName(pUser.getName());
+        user.setPassword(passwordEncoder.encode(pUser.getPassword()));
+        user.setRole(finalRole);
+
+        // Nếu là HR: chỉ cần name + address của company
+        if ("HR".equals(finalRoleName) && pUser.getCompany() != null) {
+            String comName = pUser.getCompany().getName();
+            String comAddress = pUser.getCompany().getAddress();
+
+            if (comName != null && !comName.trim().isEmpty()) {
+                Company savedCompany = companyService.createCompanyForRegistration(comName, comAddress);
+                user.setCompany(savedCompany);
+            }
+        }
+
+        User saved = userService.handleCreateUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.convertToResCreateUserDTO(saved));
     }
 
     @PutMapping("/auth/change-password")

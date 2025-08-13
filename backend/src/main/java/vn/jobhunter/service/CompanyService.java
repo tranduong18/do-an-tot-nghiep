@@ -139,33 +139,24 @@ public class CompanyService {
             throw new AccessDeniedException("Bạn không có quyền xóa công ty này");
         }
 
-        // Xóa toàn bộ user, job thuộc công ty này
         List<User> users = this.userRepository.findByCompany(com);
         List<Job> jobs  = this.jobRepository.findByCompany(com);
 
         if (!users.isEmpty()) {
             favoriteJobRepository.deleteByUserIn(users);
             reviewRepository.deleteByUserIn(users);
-            // (tùy chọn) nếu muốn xoá resume của các user này (nếu có FK user_id)
+
             resumeRepository.deleteByUserIn(users);
         }
-
-        // 2.2 Resume ứng tuyển vào các Job của công ty
         if (!jobs.isEmpty()) {
             favoriteJobRepository.deleteByJobIn(jobs);
             resumeRepository.deleteByJobIn(jobs);
         }
-
-        // 2.3 Review gắn trực tiếp với công ty (nếu bảng review có cột company_id)
         reviewRepository.deleteByCompany(com);
 
-        // 3) Xóa jobs của công ty
         if (!jobs.isEmpty()) {
             jobRepository.deleteAll(jobs);
-            // hoặc: jobRepository.deleteByCompany(com);
         }
-
-        // 4) Xóa users thuộc công ty
         if (!users.isEmpty()) {
             userRepository.deleteAll(users);
         }
@@ -174,5 +165,12 @@ public class CompanyService {
 
     public Optional<Company> findById(long id) {
         return this.companyRepository.findById(id);
+    }
+
+    public Company createCompanyForRegistration(String name, String address) {
+        Company c = new Company();
+        c.setName(name);
+        c.setAddress(address);
+        return companyRepository.save(c);
     }
 }

@@ -9,9 +9,18 @@ export const fetchDashboardSummary = (params?: { months?: number; top?: number; 
  * 
 Module Auth
  */
-export const callRegister = (name: string, email: string, password: string, age: number, gender: string, address: string) => {
-    return axios.post<IBackendRes<IUser>>('/api/v1/auth/register', { name, email, password, age, gender, address })
-}
+export const callRegister = (
+    name: string, email: string, password: string,
+    age: number, gender: string, address: string,
+    roleName: 'Candidate' | 'HR', companyName?: string, companyAddress?: string
+) =>
+    axios.post<IBackendRes<IUser>>('/api/v1/auth/register', {
+        name, email, password, age, gender, address,
+        role: { name: roleName },
+        ...(roleName === 'HR' && companyName && companyAddress
+            ? { company: { name: companyName, address: companyAddress } }
+            : {})
+    });
 
 export const callLogin = (username: string, password: string) => {
     return axios.post<IBackendRes<IAccount>>('/api/v1/auth/login', { username, password })

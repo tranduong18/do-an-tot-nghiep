@@ -99,6 +99,7 @@ export interface IUser {
     company?: {
         id: string;
         name: string;
+        address?: string;
     }
     createdBy?: string;
     isDeleted?: boolean;

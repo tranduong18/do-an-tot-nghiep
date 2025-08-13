@@ -245,7 +245,7 @@ const ClientCompanyDetailPage = () => {
                                     <Button type="primary" danger onClick={openCreateModal}>
                                         Viết đánh giá
                                     </Button>
-                                    <Button type="primary">Theo dõi</Button>
+
                                 </div>
                             </div>
                         </div>
