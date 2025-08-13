@@ -427,7 +427,11 @@ const ClientCompanyDetailPage = () => {
                                                         )}
                                                     </Space>
                                                 }
-                                                description={item.content || "(Không có nội dung)"}
+                                                description={
+                                                    <div style={{ whiteSpace: "pre-line" }}>
+                                                        {item.content}
+                                                    </div>
+                                                }
                                             />
                                         </List.Item>
                                     )}

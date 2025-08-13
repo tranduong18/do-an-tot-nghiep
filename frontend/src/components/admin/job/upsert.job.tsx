@@ -312,10 +312,9 @@ const ViewUpsertJob = () => {
                                 label="Loại hình làm việc"
                                 placeholder="Chọn loại hình làm việc"
                                 options={[
-                                    { label: "Toàn thời gian", value: "Full-time" },
-                                    { label: "Bán thời gian", value: "Part-time" },
-                                    { label: "Remote", value: "Remote" },
-                                    { label: "Hybrid", value: "Hybrid" },
+                                    { label: "Tại văn phòng", value: "Onsite" },
+                                    { label: "Làm từ xa", value: "Remote" },
+                                    { label: "Linh hoạt", value: "Hybrid" },
                                 ]}
                                 rules={[
                                     { required: true, message: "Vui lòng chọn loại hình làm việc!" },

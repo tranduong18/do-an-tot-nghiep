@@ -141,6 +141,15 @@ const ClientJobDetailPage = () => {
         }
     };
 
+    const workTypeLabels: Record<string, string> = {
+        onsite: "Tại văn phòng",
+        remote: "Làm từ xa",
+        hybrid: "Linh hoạt",
+    };
+
+    const toViWorkType = (value?: string) =>
+        workTypeLabels[value?.toLowerCase() ?? ""] || value || "";
+
     return (
         <div className={jobStyles["job-detail-container"]}>
             <PageHelmet title={jobDetail?.name || "Chi tiết công việc"} />
@@ -220,7 +229,7 @@ const ClientJobDetailPage = () => {
                                         </p>
                                         {jobDetail.workType && (
                                             <p>
-                                                <strong>Hình thức:</strong> {jobDetail.workType}
+                                                <strong>Hình thức:</strong> {toViWorkType(jobDetail.workType)}
                                             </p>
                                         )}
                                     </div>
@@ -328,7 +337,7 @@ const ClientJobDetailPage = () => {
                                                         {job.workType && (
                                                             <p className={jobStyles["job-meta"]} style={{ marginTop: 5 }}>
                                                                 <BankOutlined />{" "}
-                                                                {job.workType}
+                                                                {toViWorkType(jobDetail.workType)}
                                                             </p>
                                                         )}
 
@@ -377,15 +386,15 @@ const ClientJobDetailPage = () => {
                                         </p>
                                         <p>
                                             <strong>Quốc gia:</strong>{" "}
-                                            {jobDetail.company?.country || "🇻🇳 Việt Nam"}
+                                            {jobDetail.company?.country || "Việt Nam"}
                                         </p>
                                         <p>
                                             <strong>Thời gian làm việc:</strong>{" "}
-                                            {jobDetail.company?.workingTime || "🇻🇳 Việt Nam"}
+                                            {jobDetail.company?.workingTime || "Việt Nam"}
                                         </p>
                                         <p>
                                             <strong>Làm việc ngoài giờ:</strong>{" "}
-                                            {jobDetail.company?.overtimePolicy || "🇻🇳 Việt Nam"}
+                                            {jobDetail.company?.overtimePolicy || "Việt Nam"}
                                         </p>
                                     </div>
 

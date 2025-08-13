@@ -88,6 +88,10 @@ export const callFetchJobsByCompanyId = (companyId: string) => {
     return axios.get<IBackendRes<IJob[]>>(`/api/v1/companies/${companyId}/jobs`);
 };
 
+export const callFetchJobSpecializations = async () => {
+    return axios.get(`/api/v1/jobs/specializations`);
+};
+
 /**
  * 
 Module Skill

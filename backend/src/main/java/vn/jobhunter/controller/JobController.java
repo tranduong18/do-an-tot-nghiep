@@ -84,8 +84,9 @@ public class JobController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) List<String> skills,
             @RequestParam(required = false) List<String> location,
+            @RequestParam(required = false) List<String> levels,
             Pageable pageable) {
-        return ResponseEntity.ok(jobService.searchJobs(q, skills, location, pageable));
+        return ResponseEntity.ok(jobService.searchJobs(q, skills, location, levels, pageable));
     }
 
     // ✅ API suggestions cho autocomplete
@@ -99,5 +100,11 @@ public class JobController {
     @ApiMessage("Get similar jobs")
     public ResponseEntity<List<ResSimilarJobDTO>> getSimilarJobs(@PathVariable("id") long id) throws IdInvalidException {
         return ResponseEntity.ok(jobService.findSimilarJobs(id));
+    }
+
+    @GetMapping("/jobs/specializations")
+    @ApiMessage("Get all specializations")
+    public ResponseEntity<List<String>> getAllSpecializations() {
+        return ResponseEntity.ok(jobService.getAllSpecializations());
     }
 }

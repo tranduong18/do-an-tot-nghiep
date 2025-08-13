@@ -44,14 +44,14 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
     @Query("SELECT COUNT(j) FROM Job j WHERE j.createdAt BETWEEN :start AND :end")
     long countCreatedBetween(@Param("start") Instant start, @Param("end") Instant end);
 
-    // Đếm job đang mở (active + chưa hết hạn)
+
     @Query("""
     SELECT COUNT(j) FROM Job j
     WHERE j.active = true AND (j.endDate IS NULL OR j.endDate >= :now)
 """)
     long countActive(@Param("now") Instant now);
 
-    // Top công ty theo số job tạo trong tháng hiện tại
+
     @Query("""
     SELECT j.company.name, COUNT(j)
     FROM Job j
@@ -61,7 +61,7 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 """)
     List<Object[]> topCompaniesThisMonth(@Param("start") Instant start, @Param("end") Instant end);
 
-    // Phân bổ chuyên môn job (đang mở) cho donut
+
     @Query("""
     SELECT j.specialization, COUNT(j)
     FROM Job j
@@ -71,6 +71,12 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 """)
     List<Object[]> specializationCountsActive(@Param("now") Instant now);
 
-
-
+    @Query("""
+   SELECT DISTINCT j.specialization
+   FROM Job j
+   WHERE j.active = true AND (j.endDate IS NULL OR j.endDate >= CURRENT_TIMESTAMP)
+     AND j.specialization IS NOT NULL AND j.specialization <> ''
+   ORDER BY j.specialization ASC
+""")
+    List<String> findDistinctSpecializations();
 }

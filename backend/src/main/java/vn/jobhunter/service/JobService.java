@@ -27,6 +27,7 @@ import vn.jobhunter.domain.response.job.ResSimilarJobDTO;
 import vn.jobhunter.domain.response.job.ResUpdateJobDTO;
 import vn.jobhunter.repository.*;
 import vn.jobhunter.util.SecurityUtil;
+import vn.jobhunter.util.constant.LevelEnum;
 import vn.jobhunter.util.error.IdInvalidException;
 
 @Service
@@ -213,7 +214,7 @@ public class JobService {
         return rs;
     }
 
-    public ResultPaginationDTO searchJobs(String q, List<String> skills, List<String> locations, Pageable pageable) {
+    public ResultPaginationDTO searchJobs(String q, List<String> skills, List<String> locations, List<String> levelStrings,    Pageable pageable) {
         Specification<Job> spec = Specification.where(null);
 
         // Lọc theo keyword (job name hoặc company name)
@@ -242,6 +243,25 @@ public class JobService {
         // Lọc theo location
         if (locations != null && !locations.isEmpty()) {
             spec = spec.and((root, query, cb) -> root.get("location").in(locations));
+        }
+
+        // levels
+        if (levelStrings != null && !levelStrings.isEmpty()) {
+            List<LevelEnum> levels = levelStrings.stream()
+                    .flatMap(s -> java.util.Arrays.stream(s.split(",")))
+                    .map(String::trim)
+                    .filter(str -> !str.isEmpty())
+                    .map(str -> {
+                        String u = str.toUpperCase();
+                        if (u.equals("MID")) u = "MIDDLE";
+                        return LevelEnum.valueOf(u);
+                    })
+                    .distinct()
+                    .toList();
+
+            if (!levels.isEmpty()) {
+                spec = spec.and((root, query, cb) -> root.get("level").in(levels));
+            }
         }
 
         Page<Job> pageJob = jobRepository.findAll(spec, pageable);
@@ -364,5 +384,7 @@ public class JobService {
             return dto;
         }).toList();
     }
-
+    public List<String> getAllSpecializations() {
+        return jobRepository.findDistinctSpecializations();
+    }
 }

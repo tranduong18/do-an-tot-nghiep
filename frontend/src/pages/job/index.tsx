@@ -1,8 +1,10 @@
 import SearchClient from '@/components/client/search.client';
-import { Col, Divider, Row } from 'antd';
+import { Col, Row } from 'antd';
 import styles from 'styles/client.module.scss';
 import JobCard from '@/components/client/card/job.card';
+
 import PageHelmet from '@/components/share/page.helmet';
+import JobIndexCard from '@/components/client/card/jobIndex.card';
 
 const ClientJobPage = (props: any) => {
     return (
@@ -15,7 +17,7 @@ const ClientJobPage = (props: any) => {
                     </Col>
 
                     <Col span={24}>
-                        <JobCard
+                        <JobIndexCard
                             showPagination={true}
                         />
                     </Col>

@@ -17,7 +17,7 @@ import {
 } from "antd";
 import type { UploadProps } from "antd";
 import enUS from "antd/lib/locale/en_US";
-import { UploadOutlined, FilePdfOutlined, CheckCircleTwoTone } from "@ant-design/icons";
+import { UploadOutlined, FilePdfOutlined, CheckCircleTwoTone, LoadingOutlined } from "@ant-design/icons";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setUserDetail } from "@/redux/slice/userDetailSlide";
@@ -48,6 +48,10 @@ const ApplyModal = (props: IProps) => {
     const [urlCV, setUrlCV] = useState<string>("");
     const [fileList, setFileList] = useState<any[]>([]);
 
+    // trạng thái upload UI (xoay + check)
+    const [uploading, setUploading] = useState(false);
+    const [uploaded, setUploaded] = useState(false);
+
     // 1) Khi mở modal: nếu đã login mà userDetail chưa có => fetch
     useEffect(() => {
         const fetchDetail = async () => {
@@ -58,7 +62,7 @@ const ApplyModal = (props: IProps) => {
             try {
                 const res = await callGetUserById(accountUser.id);
                 if (res?.data) dispatch(setUserDetail(res.data));
-            } catch (e) {
+            } catch {
                 // ignore
             }
         };
@@ -72,10 +76,14 @@ const ApplyModal = (props: IProps) => {
             setMode("existing");
             setUrlCV(savedCvUrl);
             setFileList([]);
+            setUploaded(false);
+            setUploading(false);
         } else {
             setMode("new");
             setUrlCV("");
             setFileList([]);
+            setUploaded(false);
+            setUploading(false);
         }
     }, [isModalOpen, savedCvUrl]);
 
@@ -104,35 +112,52 @@ const ApplyModal = (props: IProps) => {
         maxCount: 1,
         multiple: false,
         accept: "application/pdf,application/msword,.doc,.docx,.pdf",
+        showUploadList: false,
         async customRequest({ file, onSuccess, onError }: any) {
             try {
+                setUploading(true);
+                setUploaded(false);
                 const res = await callUploadSingleFile(file, "resume", "file");
                 if (res && res.data) {
                     setUrlCV(res.data.fileName);
                     setFileList([
-                        { uid: Date.now().toString(), name: res.data.fileName, status: "done", url: res.data.fileName },
+                        {
+                            uid: Date.now().toString(),
+                            name: res.data.fileName,
+                            status: "done",
+                            url: res.data.fileName,
+                        },
                     ]);
+                    message.success("Tải CV thành công!");
+                    setUploaded(true);
                     onSuccess?.("ok");
                 } else {
-                    setUrlCV("");
-                    setFileList([]);
-                    onError?.(new Error(res?.message || "Upload lỗi"));
+                    throw new Error(res?.message || "Upload lỗi");
                 }
             } catch (e: any) {
                 setUrlCV("");
                 setFileList([]);
+                message.error(e?.message || "Đã có lỗi xảy ra khi upload file.");
                 onError?.(new Error(e?.message || "Upload lỗi"));
+            } finally {
+                setUploading(false);
             }
         },
         onRemove() {
             setUrlCV("");
             setFileList([]);
+            setUploaded(false);
         },
         onChange(info) {
+            // dự phòng nếu không chạy vào onSuccess của customRequest
             if (info.file.status === "done") {
                 message.success(`${info.file.name} uploaded successfully`);
+                setUploaded(true);
+                setUploading(false);
             } else if (info.file.status === "error") {
                 message.error(info?.file?.error?.event?.message ?? "Đã có lỗi xảy ra khi upload file.");
+                setUploading(false);
+                setUploaded(false);
             }
         },
         fileList,
@@ -148,6 +173,7 @@ const ApplyModal = (props: IProps) => {
             okText={isAuthenticated ? "Rải CV Nào" : "Đăng Nhập Nhanh"}
             cancelButtonProps={{ style: { display: "none" } }}
             destroyOnClose
+            okButtonProps={{ disabled: uploading }} // tránh submit khi đang upload
         >
             <Divider />
             {isAuthenticated ? (
@@ -157,8 +183,7 @@ const ApplyModal = (props: IProps) => {
                             <Row gutter={[10, 10]}>
                                 <Col span={24}>
                                     <div>
-                                        Bạn đang ứng tuyển công việc <b>{jobDetail?.name}</b> tại{" "}
-                                        <b>{jobDetail?.company?.name}</b>
+                                        Bạn đang ứng tuyển công việc <b>{jobDetail?.name}</b> tại <b>{jobDetail?.company?.name}</b>
                                     </div>
                                 </Col>
                                 <Col span={24}>
@@ -187,8 +212,12 @@ const ApplyModal = (props: IProps) => {
                                                         setMode("new");
                                                     }
                                                     setFileList([]);
+                                                    setUploaded(false);
+                                                    setUploading(false);
                                                 } else {
                                                     setUrlCV("");
+                                                    setUploaded(false);
+                                                    setUploading(false);
                                                 }
                                             }}
                                         >
@@ -214,15 +243,15 @@ const ApplyModal = (props: IProps) => {
                                         )}
 
                                         {mode === "new" && (
-                                            <ProForm.Item
-                                                label="Upload file CV"
-                                                rules={[{ required: true, message: "Vui lòng upload file!" }]}
-                                            >
-                                                <Upload {...propsUpload}>
-                                                    <Button icon={<UploadOutlined />}>
-                                                        Tải lên CV của bạn (Hỗ trợ *.doc, *.docx, *.pdf &lt; 5MB)
-                                                    </Button>
-                                                </Upload>
+                                            <ProForm.Item label="Upload file CV" rules={[{ required: true, message: "Vui lòng upload file!" }]}>
+                                                <Space align="center" wrap>
+                                                    <Upload {...propsUpload}>
+                                                        <Button icon={uploading ? <LoadingOutlined /> : <UploadOutlined />} disabled={uploading}>
+                                                            {uploading ? "Đang tải lên..." : "Tải lên CV của bạn (.doc, .docx, .pdf < 5MB)"}
+                                                        </Button>
+                                                    </Upload>
+                                                    {uploaded && !uploading && <CheckCircleTwoTone twoToneColor="#52c41a" />}
+                                                </Space>
                                             </ProForm.Item>
                                         )}
                                     </Space>
