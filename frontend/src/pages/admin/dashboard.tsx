@@ -1,5 +1,4 @@
-// src/pages/admin/DashboardAdmin.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     Card,
     Col,
@@ -49,7 +48,7 @@ Chart.register(
     Title
 );
 
-// ===== Types =====
+
 type LabelCount = { label: string; count: number };
 
 interface SummaryCards {
@@ -61,7 +60,7 @@ interface SummaryCards {
     companiesNew30d: number;
     jobsNew30d: number;
     activeUsers24h: number;
-    hrUsers?: number; // có thể chưa có trên backend cũ
+    hrUsers?: number;
 }
 
 interface SummaryCharts {
@@ -79,7 +78,6 @@ interface DashboardSummaryDTO {
 
 const CHART_HEIGHT = 260;
 
-/** Bảng màu cho Pie (và có thể tái dùng) */
 const BASE_COLORS = [
     '#5B8FF9', '#5AD8A6', '#5D7092', '#F6BD16', '#E8684A',
     '#6DC8EC', '#9270CA', '#FF9D4D', '#269A99', '#FF99C3',
@@ -92,7 +90,7 @@ const pickColors = (n: number) => {
     });
 };
 
-// --- Helper: group Top N + Others ---
+
 const groupTopN = (items: { label: string; count: number }[], topN = 6) => {
     const sorted = [...items].sort((a, b) => b.count - a.count);
     const top = sorted.slice(0, topN);
@@ -101,7 +99,7 @@ const groupTopN = (items: { label: string; count: number }[], topN = 6) => {
     return others > 0 ? [...top, { label: 'Khác', count: others }] : top;
 };
 
-// --- Helper: wrap label thành 2 dòng nếu quá dài ---
+
 const wrapLabel = (s: string, max = 18) => {
     const words = (s || '').split(' ');
     const lines: string[] = [];
@@ -113,10 +111,10 @@ const wrapLabel = (s: string, max = 18) => {
         } else cur = (cur ? cur + ' ' : '') + w;
     }
     if (cur) lines.push(cur.trim());
-    return lines.slice(0, 2); // tối đa 2 dòng
+    return lines.slice(0, 2);
 };
 
-// --- Plugin vẽ value trên cột ---
+
 const valueLabelPlugin = {
     id: 'valueLabel',
     afterDatasetsDraw(chart: any) {
@@ -143,7 +141,7 @@ const valueLabelPlugin = {
     },
 };
 
-// --- Dense ranking cho Top công ty (đồng hạng nếu cùng count) ---
+
 type LC = { label: string; count: number };
 const denseRanking = (items: LC[]) => {
     const sorted = [...items].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
@@ -158,7 +156,7 @@ const denseRanking = (items: LC[]) => {
     });
 };
 
-const DashboardAdmin: React.FC = () => {
+const DashboardAdmin = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [summary, setSummary] = useState<DashboardSummaryDTO | null>(null);
 
@@ -180,7 +178,7 @@ const DashboardAdmin: React.FC = () => {
         fetchSummary();
     }, []);
 
-    // Trim label / fallback “Khác”
+
     const sanitizeSummary = (data: DashboardSummaryDTO): DashboardSummaryDTO => {
         const trimList = (arr?: LabelCount[]) =>
             (arr || []).map((it) => ({
@@ -210,7 +208,7 @@ const DashboardAdmin: React.FC = () => {
         };
     };
 
-    // ===== Derived chart data =====
+
     const charts = useMemo(() => {
         const s = summary;
 
@@ -262,7 +260,7 @@ const DashboardAdmin: React.FC = () => {
         return { lineJobsTs, pieSpec, barPeakHour };
     }, [summary]);
 
-    // Top công ty đồng hạng
+
     const rankedTopCompanies = useMemo(() => {
         const raw = (summary?.charts?.topCompaniesThisMonth || []).map(i => ({
             label: (i.label || 'Khác').trim(),
@@ -316,7 +314,7 @@ const DashboardAdmin: React.FC = () => {
                         <Col xs={12} lg={6}><Card><Statistic title="Active 24h" value={summary.cards.activeUsers24h} prefix={<ThunderboltOutlined />} /></Card></Col>
                     </Row>
 
-                    {/* Hàng: line jobs & donut specialization */}
+
                     <Row gutter={16} style={{ marginBottom: 24 }}>
                         <Col xs={24} lg={12}>
                             <Card title="Việc mới theo tháng">
@@ -352,7 +350,7 @@ const DashboardAdmin: React.FC = () => {
                         </Col>
                     </Row>
 
-                    {/* Hàng: bar peak hour & top companies list (đồng hạng) */}
+
                     <Row gutter={16} style={{ marginBottom: 24 }}>
                         <Col xs={24} lg={12}>
                             <Card title="Khung giờ nộp hồ sơ cao điểm (30 ngày)">
@@ -399,7 +397,7 @@ const DashboardAdmin: React.FC = () => {
                         </Col>
                     </Row>
 
-                    {/* Hàng: bar resumes by specialization (đã nâng cấp) */}
+
                     <Row gutter={16} style={{ marginBottom: 24 }}>
                         <Col xs={24} lg={24}>
                             <Card title="Hồ sơ theo chuyên môn (năm hiện tại)">
@@ -409,7 +407,7 @@ const DashboardAdmin: React.FC = () => {
                                             label: (i.label || 'Khác').trim(),
                                             count: i.count || 0,
                                         }));
-                                        const dataTop = groupTopN(raw, 6); // Top 6 + Khác
+                                        const dataTop = groupTopN(raw, 6);
                                         const labels = dataTop.map(i => wrapLabel(i.label));
                                         const values = dataTop.map(i => i.count);
 
@@ -439,7 +437,7 @@ const DashboardAdmin: React.FC = () => {
                                                 plugins={[valueLabelPlugin]}
                                                 options={{
                                                     responsive: true,
-                                                    indexAxis: 'y' as const, // horizontal bar cho label dài
+                                                    indexAxis: 'y' as const,
                                                     plugins: {
                                                         legend: { display: false },
                                                         tooltip: {

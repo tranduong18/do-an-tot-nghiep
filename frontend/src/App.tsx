@@ -74,14 +74,12 @@ export default function App() {
     dispatch(fetchAccount())
   }, [])
 
-  // ✅ Kết nối SSE khi đã đăng nhập
   const apiBaseUrl = import.meta.env.VITE_BACKEND_URL as string;
   useResumeSSE({
     apiBaseUrl,
     userId: account?.id,
     onEvent: () => {
-      // TODO: nếu bạn có badge thông báo: gọi refetch unread-count ở đây
-      // dispatch(fetchUnreadCount());
+
     },
   });
 

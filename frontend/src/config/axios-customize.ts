@@ -36,7 +36,7 @@ instance.interceptors.request.use(function (config) {
         config.headers.Accept = "application/json";
         config.headers["Content-Type"] = "application/json; charset=utf-8";
     }
-    // ✅ Thêm header X-Admin-View khi đang ở trang quản trị
+
     if (typeof window !== "undefined") {
         const isAdminPage = window.location.pathname.includes("/admin/");
         config.headers["X-Admin-View"] = isAdminPage ? "true" : "false";
@@ -72,7 +72,6 @@ instance.interceptors.response.use(
             && location.pathname.startsWith("/admin")
         ) {
             const message = error?.response?.data?.error ?? "Có lỗi xảy ra, vui lòng login.";
-            //dispatch redux action
             store.dispatch(setRefreshTokenAction({ status: true, message }));
         }
 

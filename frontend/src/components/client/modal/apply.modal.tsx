@@ -39,8 +39,8 @@ const ApplyModal = (props: IProps) => {
     const navigate = useNavigate();
 
     const isAuthenticated = useAppSelector((s) => s.account.isAuthenticated);
-    const accountUser = useAppSelector((s) => s.account.user) as IUser; // dùng email/id
-    const userDetail = useAppSelector((s) => s.userDetail.user) as IUser; // chứa cvUrl
+    const accountUser = useAppSelector((s) => s.account.user) as IUser;
+    const userDetail = useAppSelector((s) => s.userDetail.user) as IUser;
 
     const savedCvUrl = useMemo(() => userDetail?.cvUrl || "", [userDetail]);
 
@@ -48,11 +48,9 @@ const ApplyModal = (props: IProps) => {
     const [urlCV, setUrlCV] = useState<string>("");
     const [fileList, setFileList] = useState<any[]>([]);
 
-    // trạng thái upload UI (xoay + check)
     const [uploading, setUploading] = useState(false);
     const [uploaded, setUploaded] = useState(false);
 
-    // 1) Khi mở modal: nếu đã login mà userDetail chưa có => fetch
     useEffect(() => {
         const fetchDetail = async () => {
             if (!isModalOpen || !isAuthenticated) return;
@@ -63,13 +61,13 @@ const ApplyModal = (props: IProps) => {
                 const res = await callGetUserById(accountUser.id);
                 if (res?.data) dispatch(setUserDetail(res.data));
             } catch {
-                // ignore
+
             }
         };
         fetchDetail();
     }, [isModalOpen, isAuthenticated, accountUser?.id]);
 
-    // 2) Mỗi lần mở modal: preset theo savedCvUrl
+
     useEffect(() => {
         if (!isModalOpen) return;
         if (savedCvUrl) {
@@ -149,9 +147,8 @@ const ApplyModal = (props: IProps) => {
             setUploaded(false);
         },
         onChange(info) {
-            // dự phòng nếu không chạy vào onSuccess của customRequest
             if (info.file.status === "done") {
-                message.success(`${info.file.name} uploaded successfully`);
+                message.success(`${info.file.name} uploaded thành công`);
                 setUploaded(true);
                 setUploading(false);
             } else if (info.file.status === "error") {
@@ -173,7 +170,7 @@ const ApplyModal = (props: IProps) => {
             okText={isAuthenticated ? "Rải CV Nào" : "Đăng Nhập Nhanh"}
             cancelButtonProps={{ style: { display: "none" } }}
             destroyOnClose
-            okButtonProps={{ disabled: uploading }} // tránh submit khi đang upload
+            okButtonProps={{ disabled: uploading }}
         >
             <Divider />
             {isAuthenticated ? (
